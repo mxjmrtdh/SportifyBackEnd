@@ -13,6 +13,24 @@ Este es el backend del proyecto integrador de **Digital House**. El sistema perm
 Para poder ejecutar y trabajar con el proyecto, puedes utilizar los siguientes comandos:
 
 ### 1. **Compilar y empaquetar el proyecto**:
+Este comando compila el proyecto y genera el archivo JAR ejecutable.
 
-```bash
-mvn clean package
+ ```bash
+   mvn clean package
+ ```
+### 2. **Ejecutar el servidor**:
+ ```bash
+  mvn spring-boot:run
+ ```
+### 3. **Limpiar el proyecto**:
+ ```bash
+  mvn clean
+ ```
+### 4. **Instalar dependencias**:
+ ```bash
+  mvn install
+ ```
+### 5. **Verificar versión de maven**:
+ ```bash
+  mvn -v
+ ```

@@ -1,13 +1,14 @@
 package com.digitalhouse.court_rental.entity;
 
 import com.digitalhouse.court_rental.entity.court.City;
-import com.digitalhouse.court_rental.entity.court.CourtStatus;
 import com.digitalhouse.court_rental.entity.court.Sport;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "court")
@@ -30,6 +31,8 @@ public class Court {
     @Column(nullable = false)
     private int capacity;
 
+    private BigDecimal pricePerHour;
+
     @Column(nullable = false, length = 255)
     private String address;
 
@@ -45,6 +48,6 @@ public class Court {
     private Sport sport;
 
     @ManyToOne
-    @JoinColumn(name = "id_court_status", nullable = false)
-    private CourtStatus courtStatus;
+    @JoinColumn(name = "id_status", nullable = false)
+    private Status status;
 }

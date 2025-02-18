@@ -3,7 +3,7 @@ package com.digitalhouse.court_rental.service;
 import com.digitalhouse.court_rental.dto.CourtDTO;
 import com.digitalhouse.court_rental.entity.Court;
 import com.digitalhouse.court_rental.entity.court.City;
-import com.digitalhouse.court_rental.entity.court.CourtStatus;
+import com.digitalhouse.court_rental.entity.CourtStatus;
 import com.digitalhouse.court_rental.entity.court.Sport;
 import com.digitalhouse.court_rental.repository.CourtRepository;
 import org.junit.jupiter.api.BeforeEach;

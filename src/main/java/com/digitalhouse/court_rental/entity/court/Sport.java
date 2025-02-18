@@ -1,5 +1,6 @@
 package com.digitalhouse.court_rental.entity.court;
 
+import com.digitalhouse.court_rental.entity.Status;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,6 +17,6 @@ public class Sport {
     private String sportName;
 
     @ManyToOne
-    @JoinColumn(name = "id_sport_status")
-    private SportStatus sportStatus;
+    @JoinColumn(name = "id_status")
+    private Status status;
 }

@@ -1,6 +1,7 @@
 package com.digitalhouse.court_rental.controller;
 
 import com.digitalhouse.court_rental.dto.CourtDTO;
+import com.digitalhouse.court_rental.dto.CourtRequestDTO;
 import com.digitalhouse.court_rental.entity.Court;
 import com.digitalhouse.court_rental.service.CourtService;
 import jakarta.validation.Valid;
@@ -18,8 +19,9 @@ public class CourtController {
 
     private final CourtService courtService;
     @PostMapping("/add")
-    public ResponseEntity<Court> createCourt(@RequestBody @Valid Court court) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(courtService.createCourt(court));
+    public ResponseEntity<Court> createCourt(@RequestBody @Valid CourtRequestDTO courtRequest) {
+        Court newCourt = courtService.createCourt(courtRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(newCourt);
     }
 
     @GetMapping("/search")
@@ -32,8 +34,19 @@ public class CourtController {
         return courtService.getCourtById(id);
     }
 
-//    @GetMapping("/random")
-//    public ResponseEntity<List<Court>> getRandomCourts() {
-//        return ResponseEntity.ok(courtService.getRandomCourts(10));
-//    }
+    @GetMapping("/random")
+    public ResponseEntity<List<CourtDTO>> getRandomCourts() {
+        return ResponseEntity.ok(courtService.getRandomCourts());
+    }
+
+    @PutMapping("/delete/{id}")
+    public ResponseEntity<String> deleteCourt(@PathVariable Long id) {
+        courtService.deleteCourt(id);
+        return ResponseEntity.ok("Court deleted successfully");
+    }
+
+    @GetMapping("/category/{sportId}")
+    public ResponseEntity<List<CourtDTO>> getCourtsBySport(@PathVariable int sportId) {
+        return ResponseEntity.ok(courtService.getCourtsBySport(sportId));
+    }
 }

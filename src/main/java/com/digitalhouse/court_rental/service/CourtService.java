@@ -67,7 +67,6 @@ public class CourtService {
         return convertToDTO(court);
     }
 
-
     private CourtDTO convertToDTO(Court court) {
         CourtDTO courtDTO = new CourtDTO();
         courtDTO.setId(court.getIdCourt());

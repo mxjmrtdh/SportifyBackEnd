@@ -1,5 +1,6 @@
 package com.digitalhouse.court_rental.entity.court;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,5 +18,6 @@ public class City {
 
     @ManyToOne
     @JoinColumn(name = "id_region")
+    @JsonBackReference
     private Region region;
 }

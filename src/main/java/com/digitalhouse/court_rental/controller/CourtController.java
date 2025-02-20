@@ -4,12 +4,15 @@ import com.digitalhouse.court_rental.dto.CourtDTO;
 import com.digitalhouse.court_rental.dto.CourtRequestDTO;
 import com.digitalhouse.court_rental.entity.Court;
 import com.digitalhouse.court_rental.service.CourtService;
-import jakarta.validation.Valid;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -18,9 +21,15 @@ import java.util.List;
 public class CourtController {
 
     private final CourtService courtService;
-    @PostMapping("/add")
-    public ResponseEntity<Court> createCourt(@RequestBody @Valid CourtRequestDTO courtRequest) {
-        Court newCourt = courtService.createCourt(courtRequest);
+    @PostMapping(value = "/add", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<Court> createCourt(
+            @RequestPart("court")  String courtJson,//@Valid CourtRequestDTO courtRequest,
+            @RequestPart("images") List<MultipartFile> images) throws IOException {
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        CourtRequestDTO courtRequest = objectMapper.readValue(courtJson, CourtRequestDTO.class);
+
+        Court newCourt = courtService.createCourt(courtRequest,images);
         return ResponseEntity.status(HttpStatus.CREATED).body(newCourt);
     }
 

@@ -7,8 +7,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Entity
 @Table(name = "court")
@@ -38,6 +40,12 @@ public class Court {
 
     @Column(nullable = false, length = 255)
     private String neighborhood;
+
+    @ElementCollection
+    @CollectionTable(name = "court_images", joinColumns = @JoinColumn(name = "id_court"))
+    @Column(name = "image_url")
+    private List<String> imageUrl;
+
 
     @ManyToOne
     @JoinColumn(name = "id_city", nullable = false)

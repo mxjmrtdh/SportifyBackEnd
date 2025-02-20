@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class SportDTO {
-    private Long id;
-    private String name;
+public class CountryDTO {
+    private int idCountry;
+    private String countryName;
 }

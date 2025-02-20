@@ -17,6 +17,7 @@ public class Country {
 
     private String countryName;
 
+
     @OneToMany(mappedBy = "country")
     @JsonManagedReference
     private List<Region> regions;

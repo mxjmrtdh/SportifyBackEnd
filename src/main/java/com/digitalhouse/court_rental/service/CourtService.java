@@ -1,15 +1,13 @@
 package com.digitalhouse.court_rental.service;
 
+import com.digitalhouse.court_rental.dto.CountryDTO;
 import com.digitalhouse.court_rental.dto.CourtDTO;
 import com.digitalhouse.court_rental.dto.CourtRequestDTO;
 import com.digitalhouse.court_rental.entity.Court;
 import com.digitalhouse.court_rental.entity.Status;
 import com.digitalhouse.court_rental.entity.court.City;
 import com.digitalhouse.court_rental.entity.court.Sport;
-import com.digitalhouse.court_rental.repository.CityRepository;
-import com.digitalhouse.court_rental.repository.CourtRepository;
-import com.digitalhouse.court_rental.repository.SportRepository;
-import com.digitalhouse.court_rental.repository.StatusRepository;
+import com.digitalhouse.court_rental.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -84,7 +82,7 @@ public class CourtService {
         court.setAddress(courtRequest.getAddress());
         court.setNeighborhood(courtRequest.getNeighborhood());
 
-        Sport sport = sportRepository.findById(courtRequest.getSportId())
+        Sport sport = sportRepository.findById((long) courtRequest.getSportId())
                 .orElseThrow(() -> new RuntimeException("Sport not found"));
         City city = cityRepository.findById(courtRequest.getCityId())
                 .orElseThrow(() -> new RuntimeException("City not found"));

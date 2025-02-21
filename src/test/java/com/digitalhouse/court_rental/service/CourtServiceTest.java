@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -159,7 +160,7 @@ class CourtServiceTest {
         List<Object[]> mockResults = new ArrayList<>();
         mockResults.add(new Object[]{
                 1, "Cancha A", "Cancha de fútbol 5", "Fútbol", 10, BigDecimal.valueOf(50.00),
-                "Activo", "123 Calle Principal", "Centro", "Lima"
+                "Activo", "123 Calle Principal", "Centro", "Lima", "imagen_url.jpg"
         });
 
         when(courtRepository.getRandomCourts()).thenReturn(mockResults);
@@ -170,6 +171,7 @@ class CourtServiceTest {
         assertEquals("Cancha A", result.getFirst().getName());
         assertEquals("Fútbol", result.getFirst().getSport());
         assertEquals(BigDecimal.valueOf(50.00), result.getFirst().getPricePerHour());
+        assertEquals("imagen_url.jpg", result.getFirst().getImageUrl().get(0));
     }
 
     @Test

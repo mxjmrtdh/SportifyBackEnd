@@ -17,14 +17,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -72,8 +73,8 @@ class CourtServiceTest {
         sampleCourt.setStatus(sampleStatus);
     }
 
-   /* @Test
-    void testCreateCourt_Success() {
+    @Test
+    void testCreateCourt_Success() throws IOException {
         CourtRequestDTO requestDTO = new CourtRequestDTO();
         requestDTO.setName("Court 1");
         requestDTO.setDescription("A great court");
@@ -85,36 +86,22 @@ class CourtServiceTest {
         requestDTO.setCityId(1);
         requestDTO.setStatusId(1);
 
+        List<MultipartFile> mockImages = new ArrayList<>();
+        MultipartFile mockImage = mock(MultipartFile.class);
+        mockImages.add(mockImage);
+
         when(courtRepository.findByCourtName(requestDTO.getName())).thenReturn(Optional.empty());
-        when(sportRepository.findById(1)).thenReturn(Optional.of(sampleSport));
+        when(sportRepository.findById(1L)).thenReturn(Optional.of(sampleSport));
         when(cityRepository.findById(1)).thenReturn(Optional.of(sampleCity));
         when(statusRepository.findById(1)).thenReturn(Optional.of(sampleStatus));
         when(courtRepository.save(any(Court.class))).thenReturn(sampleCourt);
 
-        Court result = courtService.createCourt(requestDTO);
+        Court result = courtService.createCourt(requestDTO, mockImages);
         assertNotNull(result);
         assertEquals("Court 1", result.getCourtName());
         verify(courtRepository, times(1)).save(any(Court.class));
-    }*/
+    }
 
-    /*@Test
-    void testCreateCourt_AlreadyExists() {
-        CourtRequestDTO requestDTO = new CourtRequestDTO();
-        requestDTO.setName("Court 1");
-        requestDTO.setDescription("A great court");
-        requestDTO.setCapacity(10);
-        requestDTO.setPricePerHour(BigDecimal.valueOf(50.00));
-        requestDTO.setAddress("123 Street");
-        requestDTO.setNeighborhood("Downtown");
-        requestDTO.setSportId(1);
-        requestDTO.setCityId(1);
-        requestDTO.setStatusId(1);
-
-        when(courtRepository.findByCourtName(requestDTO.getName())).thenReturn(Optional.of(sampleCourt));
-
-        //Exception exception = assertThrows(IllegalArgumentException.class, () -> courtService.createCourt(requestDTO));
-        //assertEquals("La cancha ya está registrada", exception.getMessage());
-    }*/
 
     @Test
     void testGetAllCourts_Success() {
@@ -180,9 +167,9 @@ class CourtServiceTest {
         List<CourtDTO> result = courtService.getRandomCourts();
 
         assertEquals(1, result.size());
-        assertEquals("Cancha A", result.get(0).getName());
-        assertEquals("Fútbol", result.get(0).getSport());
-        assertEquals(BigDecimal.valueOf(50.00), result.get(0).getPricePerHour());
+        assertEquals("Cancha A", result.getFirst().getName());
+        assertEquals("Fútbol", result.getFirst().getSport());
+        assertEquals(BigDecimal.valueOf(50.00), result.getFirst().getPricePerHour());
     }
 
     @Test
@@ -198,11 +185,8 @@ class CourtServiceTest {
         List<CourtDTO> result = courtService.getCourtsBySport(1);
 
         assertEquals(1, result.size());
-        assertEquals("Cancha B", result.get(0).getName());
-        assertEquals("Tenis", result.get(0).getSport());
-        assertEquals(BigDecimal.valueOf(30.00), result.get(0).getPricePerHour());
+        assertEquals("Cancha B", result.getFirst().getName());
+        assertEquals("Tenis", result.getFirst().getSport());
+        assertEquals(BigDecimal.valueOf(30.00), result.getFirst().getPricePerHour());
     }
-
-
-
 }

@@ -12,6 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -43,34 +44,6 @@ class CourtControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(courtController).build();
         objectMapper = new ObjectMapper();
     }
-
-    /*@Test
-    void testCreateCourt() throws Exception {
-        CourtRequestDTO courtRequest = new CourtRequestDTO();
-        courtRequest.setName("Cancha A");
-        courtRequest.setDescription("Cancha de fútbol 5");
-        courtRequest.setCapacity(10);
-        courtRequest.setPricePerHour(BigDecimal.valueOf(50.00));
-        courtRequest.setAddress("123 Calle Principal");
-        courtRequest.setNeighborhood("Centro");
-        courtRequest.setSportId(1);
-        courtRequest.setCityId(1);
-        courtRequest.setStatusId(1);
-
-        Court court = new Court();
-        court.setIdCourt(1);
-        court.setCourtName("Cancha A");
-
-        when(courtService.createCourt(any(CourtRequestDTO.class))).thenReturn(court);
-
-        mockMvc.perform(post("/api/courts/add")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(courtRequest)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.idCourt").value(1))
-                .andExpect(jsonPath("$.courtName").value("Cancha A"));
-    }*/
-
     @Test
     void testGetAllCourts() throws Exception {
         CourtDTO courtDTO = new CourtDTO();
@@ -123,4 +96,66 @@ class CourtControllerTest {
                 .andExpect(jsonPath("$[0].id").value(1))
                 .andExpect(jsonPath("$[0].name").value("Cancha A"));
     }
+
+    @Test
+    void testGetRandomCourts() throws Exception {
+        CourtDTO courtDTO = new CourtDTO();
+        courtDTO.setId(1);
+        courtDTO.setName("Cancha Aleatoria");
+
+        when(courtService.getRandomCourts()).thenReturn(List.of(courtDTO));
+
+        mockMvc.perform(get("/api/courts/random"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].id").value(1))
+                .andExpect(jsonPath("$[0].name").value("Cancha Aleatoria"));
+    }
+    @Test
+    void testCreateCourt_MissingImage() throws Exception {
+        CourtRequestDTO courtRequest = new CourtRequestDTO();
+        courtRequest.setName("Cancha C");
+
+        mockMvc.perform(multipart("/api/courts/add")
+                        .param("court", new ObjectMapper().writeValueAsString(courtRequest))
+                        .contentType(MediaType.MULTIPART_FORM_DATA))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void testCreateCourt_WithImages() throws Exception {
+        CourtRequestDTO courtRequest = new CourtRequestDTO();
+        courtRequest.setName("Cancha A");
+        courtRequest.setDescription("Cancha de fútbol 5");
+        courtRequest.setCapacity(10);
+        courtRequest.setPricePerHour(BigDecimal.valueOf(50.00));
+        courtRequest.setAddress("123 Calle Principal");
+        courtRequest.setNeighborhood("Centro");
+        courtRequest.setSportId(1);
+        courtRequest.setCityId(1);
+        courtRequest.setStatusId(1);
+
+        Court court = new Court();
+        court.setIdCourt(1);
+        court.setCourtName("Cancha A");
+
+        MockMultipartFile imageFile = new MockMultipartFile(
+                "images", "image.jpg", MediaType.IMAGE_JPEG_VALUE, "fake image".getBytes());
+
+        MockMultipartFile courtJson = new MockMultipartFile(
+                "court", "", MediaType.APPLICATION_JSON_VALUE, objectMapper.writeValueAsBytes(courtRequest));
+
+        when(courtService.createCourt(any(CourtRequestDTO.class), any())).thenReturn(court);
+
+        mockMvc.perform(multipart("/api/courts/add")
+                        .file(courtJson)
+                        .file(imageFile)
+                        .contentType(MediaType.MULTIPART_FORM_DATA))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.idCourt").value(1))
+                .andExpect(jsonPath("$.courtName").value("Cancha A"));
+    }
+
+
+
 }

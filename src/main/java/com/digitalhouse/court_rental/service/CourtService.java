@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.math.BigDecimal;
@@ -136,6 +137,7 @@ public class CourtService {
         courtDTO.setCity(court.getCity().getCityName());
         courtDTO.setAddress(court.getAddress());
         courtDTO.setNeighborhood(court.getNeighborhood());
+        courtDTO.setImageUrl(court.getImageUrl());
         return courtDTO;
     }
 
@@ -154,6 +156,7 @@ public class CourtService {
             courtDTO.setStatus((String) row[6]);
             courtDTO.setAddress((String) row[7]);
             courtDTO.setNeighborhood((String) row[8]);
+            courtDTO.setImageUrl(Collections.singletonList((String) row[10]));
             courtDTO.setCity((String) row[9]);
             courts.add(courtDTO);
         }

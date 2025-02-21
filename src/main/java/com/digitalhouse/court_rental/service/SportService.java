@@ -1,21 +1,18 @@
 package com.digitalhouse.court_rental.service;
 
 import com.digitalhouse.court_rental.dto.SportDTO;
-import com.digitalhouse.court_rental.entity.Status;
 import com.digitalhouse.court_rental.entity.court.Sport;
 import com.digitalhouse.court_rental.repository.SportRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class SportService {
-
-    @Autowired
-    private SportRepository sportRepository;
-
+    private final SportRepository sportRepository;
     public List<SportDTO> findByStatusFive() {
         int statusId = 5;
 

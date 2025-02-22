@@ -55,7 +55,7 @@ public class GoogleDriveService {
 
         makeFilePublic(uploadedFile.getId(), driveService);
 
-        return "https://drive.google.com/uc?id=" + uploadedFile.getId();
+        return "https://drive.google.com/uc?export=view&id=" + uploadedFile.getId();
     }
 
     private void makeFilePublic(String fileId, Drive driveService) throws IOException {

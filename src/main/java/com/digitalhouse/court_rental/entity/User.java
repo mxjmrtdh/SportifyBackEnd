@@ -1,8 +1,13 @@
 package com.digitalhouse.court_rental.entity;
 
+import com.digitalhouse.court_rental.entity.court.City;
 import jakarta.persistence.*;
 import lombok.*;
+import com.digitalhouse.court_rental.entity.DocumentType;
 
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -15,7 +20,7 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_user")
-    private Long id;
+    private Long id_user;
 
     @Column(name = "user_name", nullable = false)
     private String name;
@@ -32,23 +37,33 @@ public class User {
     @Column(name = "user_password", nullable = false)
     private String password;
 
-    //
-    //@Column(name = "phone_number", nullable = false)
-    //private String phoneNumber;
+    @Column(name = "phone_number", nullable = false)
+    private String phoneNumber;
 
-    //@Column(name = "registration_date", nullable = false)
-    //private String registrationDate;
+    @Column(name = "registration_date", nullable = false)
+    private LocalDateTime registrationDate;
 
-    //@Column(name = "id_status")
-    //private Integer statusId;
-    //
+    @Column(name = "birthdate")
+    private LocalDate birthdate;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+    @Column(name = "id_status")
+    private Integer statusId;
+
+
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     @JoinTable(
         name = "user_roles",
         joinColumns = @JoinColumn(name = "id_user"),
         inverseJoinColumns = @JoinColumn(name = "id_rol")
     )
     private Set<Rol> roles = new HashSet<>();
+
+    @ManyToOne
+    @JoinColumn(name = "id_city")
+    private City city;
+
+    @ManyToOne
+    @JoinColumn(name = "id_document_type")
+    private DocumentType documentType;
 
 }

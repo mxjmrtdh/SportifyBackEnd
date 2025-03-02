@@ -10,7 +10,7 @@ import java.time.LocalDate;
 
 @Getter
 @Setter
-public class UserDTO {
+public class UserRequestDto {
     @NotBlank(message = "Document is required")
     private String document;
 

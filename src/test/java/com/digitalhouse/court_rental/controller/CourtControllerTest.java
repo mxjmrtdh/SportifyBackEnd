@@ -52,7 +52,7 @@ class CourtControllerTest {
 
         when(courtService.getAllCourts()).thenReturn(Collections.singletonList(courtDTO));
 
-        mockMvc.perform(get("/api/courts/search"))
+        mockMvc.perform(get("/api/public/courts/search"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].id").value(1))
@@ -67,7 +67,7 @@ class CourtControllerTest {
 
         when(courtService.getCourtById(1L)).thenReturn(courtDTO);
 
-        mockMvc.perform(get("/api/courts/search/1"))
+        mockMvc.perform(get("/api/public/courts/search/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.name").value("Cancha A"));
@@ -77,7 +77,7 @@ class CourtControllerTest {
     void testDeleteCourt() throws Exception {
         doNothing().when(courtService).deleteCourt(1L);
 
-        mockMvc.perform(put("/api/courts/delete/1"))
+        mockMvc.perform(put("/api/public/courts/delete/1"))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Court deleted successfully"));
     }
@@ -90,7 +90,7 @@ class CourtControllerTest {
 
         when(courtService.getCourtsBySport(1)).thenReturn(List.of(courtDTO));
 
-        mockMvc.perform(get("/api/courts/category/1"))
+        mockMvc.perform(get("/api/public/courts/category/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].id").value(1))
@@ -105,7 +105,7 @@ class CourtControllerTest {
 
         when(courtService.getRandomCourts()).thenReturn(List.of(courtDTO));
 
-        mockMvc.perform(get("/api/courts/random"))
+        mockMvc.perform(get("/api/public/courts/random"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].id").value(1))
@@ -116,7 +116,7 @@ class CourtControllerTest {
         CourtRequestDTO courtRequest = new CourtRequestDTO();
         courtRequest.setName("Cancha C");
 
-        mockMvc.perform(multipart("/api/courts/add")
+        mockMvc.perform(multipart("/api/public/courts/add")
                         .param("court", new ObjectMapper().writeValueAsString(courtRequest))
                         .contentType(MediaType.MULTIPART_FORM_DATA))
                 .andExpect(status().isBadRequest());
@@ -147,7 +147,7 @@ class CourtControllerTest {
 
         when(courtService.createCourt(any(CourtRequestDTO.class), any())).thenReturn(court);
 
-        mockMvc.perform(multipart("/api/courts/add")
+        mockMvc.perform(multipart("/api/public/courts/add")
                         .file(courtJson)
                         .file(imageFile)
                         .contentType(MediaType.MULTIPART_FORM_DATA))

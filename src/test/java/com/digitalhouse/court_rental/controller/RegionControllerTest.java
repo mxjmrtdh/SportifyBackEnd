@@ -50,7 +50,7 @@ class RegionControllerTest {
 
         when(regionService.getRegionsByCountry(1L)).thenReturn(regions);
 
-        mockMvc.perform(get("/api/regions/by-country/1")
+        mockMvc.perform(get("/api/public/regions/by-country/1")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
@@ -66,7 +66,7 @@ class RegionControllerTest {
     void testGetRegionsByCountry_EmptyList() throws Exception {
         when(regionService.getRegionsByCountry(99L)).thenReturn(List.of());
 
-        mockMvc.perform(get("/api/regions/by-country/99")
+        mockMvc.perform(get("/api/public/regions/by-country/99")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(0)));

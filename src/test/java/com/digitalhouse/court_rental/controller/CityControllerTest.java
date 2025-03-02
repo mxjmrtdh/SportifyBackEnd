@@ -44,7 +44,7 @@ class CityControllerTest {
 
         when(cityService.findByRegionId(1)).thenReturn(List.of(cityDTO));
 
-        mockMvc.perform(get("/api/cities/by-region/1")
+        mockMvc.perform(get("/api/public/cities/by-region/1")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
@@ -56,7 +56,7 @@ class CityControllerTest {
     void testGetCitiesByRegion_EmptyList() throws Exception {
         when(cityService.findByRegionId(2)).thenReturn(Collections.emptyList());
 
-        mockMvc.perform(get("/api/cities/by-region/2")
+        mockMvc.perform(get("/api/public/cities/by-region/2")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(0)));

@@ -70,6 +70,8 @@ class CourtControllerTest {
         courtDTO.setName("Cancha A");
         when(courtService.getCourtById(1)).thenReturn(courtDTO);
 
+        when(courtService.getCourtById(1L)).thenReturn(courtDTO);
+
         mockMvc.perform(get("/api/public/courts/search/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))

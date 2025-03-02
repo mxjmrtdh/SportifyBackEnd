@@ -1,6 +1,6 @@
 package com.digitalhouse.court_rental.controller;
 
-import com.digitalhouse.court_rental.dto.UserDTO;
+import com.digitalhouse.court_rental.dto.UserRequestDto;
 import com.digitalhouse.court_rental.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,9 +18,9 @@ public class AuthController {
     private final UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody UserDTO userDTO) {
+    public ResponseEntity<?> registerUser(@Valid @RequestBody UserRequestDto userRequestDto) {
 
-        userService.registerUser(userDTO);
+        userService.registerUser(userRequestDto);
         return ResponseEntity.ok("User successfully registered.");
     }
 

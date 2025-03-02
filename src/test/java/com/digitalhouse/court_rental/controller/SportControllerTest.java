@@ -43,7 +43,7 @@ class SportControllerTest {
 
         when(sportService.findByStatusFive()).thenReturn(sports);
 
-        mockMvc.perform(get("/sports/status/5")
+        mockMvc.perform(get("/api/public/sports/status/5")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))

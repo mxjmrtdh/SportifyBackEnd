@@ -22,7 +22,9 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         // Permito acceso público, posteriormente también a "/api/auth/login"
-                        .requestMatchers("/api/auth/register").permitAll()
+                        .requestMatchers("/api/auth/register",
+                                "/api/public/**")
+                        .permitAll()
 
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/user/**").hasAnyRole("USER", "ADMIN")

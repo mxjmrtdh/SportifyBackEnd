@@ -43,7 +43,7 @@ class CountryControllerTest {
                 new CountryDTO(2, "Brasil")
         ));
 
-        mockMvc.perform(get("/api/countries/search")
+        mockMvc.perform(get("/api/public/countries/search")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
@@ -57,7 +57,7 @@ class CountryControllerTest {
     void testGetAllCountries_EmptyList() throws Exception {
         when(countryService.getAllCountries()).thenReturn(Collections.emptyList());
 
-        mockMvc.perform(get("/api/countries/search")
+        mockMvc.perform(get("/api/public/countries/search")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(0)));

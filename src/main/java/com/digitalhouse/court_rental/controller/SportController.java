@@ -8,8 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/sports")
-@CrossOrigin("*")
+@RequestMapping("/api/public/sports")
 public class SportController {
 
     @Autowired

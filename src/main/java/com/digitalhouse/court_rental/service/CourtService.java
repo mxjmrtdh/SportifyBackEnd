@@ -28,47 +28,8 @@ public class CourtService {
     private final CityRepository cityRepository;
     private final StatusRepository statusRepository;
 
-    private final GoogleDriveService googleDriveService;
+    private final ImgurService imgurService;
 
-    /*public Court createCourt(CourtRequestDTO courtRequest) throws IOException {
-        if (courtRepository.findByCourtName(courtRequest.getName()).isPresent()) {
-            throw new IllegalArgumentException("La cancha ya está registrada");
-        }
-
-        Court court = new Court();
-        court.setCourtName(courtRequest.getName());
-        court.setCourtDescription(courtRequest.getDescription());
-        court.setCapacity(courtRequest.getCapacity());
-        court.setPricePerHour(courtRequest.getPricePerHour());
-        court.setAddress(courtRequest.getAddress());
-        court.setNeighborhood(courtRequest.getNeighborhood());
-        Sport sport = sportRepository.findById(courtRequest.getSportId())
-                .orElseThrow(() -> new RuntimeException("Sport not found"));
-        City city = cityRepository.findById(courtRequest.getCityId())
-                .orElseThrow(() -> new RuntimeException("City not found"));
-        Status status = statusRepository.findById(courtRequest.getStatusId())
-                .orElseThrow(() -> new RuntimeException("Status not found"));
-
-        court.setSport(sport);
-        court.setCity(city);
-        court.setStatus(status);
-
-        List<String> imageLinks = new ArrayList<>();
-        if (courtRequest.getImages() != null) {
-            for (MultipartFile image : courtRequest.getImages()) {
-                try {
-                    String link = googleDriveService.uploadFile(image);
-                    imageLinks.add(link);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        court.setImageUrl(imageLinks);
-
-
-        return courtRepository.save(court);
-    }*/
 
     public Court createCourt(CourtRequestDTO courtRequest, List<MultipartFile> images) throws IOException {
         if (courtRepository.findByCourtName(courtRequest.getName()).isPresent()) {
@@ -98,7 +59,7 @@ public class CourtService {
         if (images != null) {
             for (MultipartFile image : images) {
                 try {
-                    String link = googleDriveService.uploadFile(image);
+                    String link = imgurService.uploadFile(image);
                     imageLinks.add(link);
                 } catch (Exception e) {
                     e.printStackTrace();

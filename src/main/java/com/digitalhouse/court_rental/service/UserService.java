@@ -1,22 +1,29 @@
 package com.digitalhouse.court_rental.service;
 
-import com.digitalhouse.court_rental.dto.UserDTO;
+import com.digitalhouse.court_rental.dto.AuthRequestDTO;
+import com.digitalhouse.court_rental.dto.AuthResponseDTO;
 import com.digitalhouse.court_rental.dto.UserRequestDto;
 import com.digitalhouse.court_rental.entity.Rol;
 import com.digitalhouse.court_rental.entity.User;
 import com.digitalhouse.court_rental.entity.court.City;
+import com.digitalhouse.court_rental.entity.DocumentType;
 import com.digitalhouse.court_rental.enums.NameRol;
 import com.digitalhouse.court_rental.repository.CityRepository;
 import com.digitalhouse.court_rental.repository.DocumentTypeRepository;
 import com.digitalhouse.court_rental.repository.RolRepository;
 import com.digitalhouse.court_rental.repository.UserRepository;
+import com.digitalhouse.court_rental.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import com.digitalhouse.court_rental.entity.DocumentType;
-
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -28,6 +35,10 @@ public class UserService {
     private final CityRepository cityRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final DocumentTypeRepository documentTypeRepository;
+
+    private final JwtUtil jwtUtil;
+    private final AuthenticationManager authenticationManager;
+    private final CustomUserDetailsService userDetailsService;
 
     public User registerUser(UserRequestDto  userRequestDto) {
 
@@ -62,6 +73,25 @@ public class UserService {
         user.setRoles(roles);
 
         return userRepository.save(user);
+    }
+
+    public AuthResponseDTO authenticate(AuthRequestDTO authRequest) {
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(authRequest.getEmail(), authRequest.getPassword())
+            );
+        }catch (Exception e){
+            throw new RuntimeException("Invalid email or password. Please try again.");
+        }
+
+        User user = userRepository.findByEmail(authRequest.getEmail())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        String role = user.getRoles().iterator().next().getName().name();
+
+
+        final String jwt = jwtUtil.generateToken(authRequest.getEmail(), role);
+        return new AuthResponseDTO(jwt, user.getName()+" "+user.getLastName(),role);
     }
 
 }

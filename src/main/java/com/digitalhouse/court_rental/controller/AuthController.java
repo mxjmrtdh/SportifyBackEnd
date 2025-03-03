@@ -1,5 +1,7 @@
 package com.digitalhouse.court_rental.controller;
 
+import com.digitalhouse.court_rental.dto.AuthRequestDTO;
+import com.digitalhouse.court_rental.dto.AuthResponseDTO;
 import com.digitalhouse.court_rental.dto.UserRequestDto;
 import com.digitalhouse.court_rental.service.UserService;
 import jakarta.validation.Valid;
@@ -24,7 +26,13 @@ public class AuthController {
         return ResponseEntity.ok("User successfully registered.");
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @PostMapping("/login")
+    public ResponseEntity<AuthResponseDTO> login(@RequestBody AuthRequestDTO authRequest) {
+        return ResponseEntity.ok(userService.authenticate(authRequest));
+    }
+
+
+/*    @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getFieldErrors().forEach(error ->
@@ -32,4 +40,5 @@ public class AuthController {
         );
         return ResponseEntity.badRequest().body(errors);
     }
+ */
 }

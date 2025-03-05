@@ -12,6 +12,12 @@ import java.util.Optional;
 public interface CourtRepository extends JpaRepository<Court, Long> {
     Optional<Court> findByCourtName(String courtName);
 
+    @Query(value = "CALL GetCourts(:page, :size)", nativeQuery = true)
+    List<Object[]> getCourts(@Param("page") int page, @Param("size") int size);
+
+    @Query(value = "CALL court_booking.GetCourtsbyId(:id)", nativeQuery = true)
+    List<Object[]> getCourtById(@Param("id") Long id);
+
     @Query(value = "CALL courtRand()", nativeQuery = true)
     List<Object[]> getRandomCourts();
 

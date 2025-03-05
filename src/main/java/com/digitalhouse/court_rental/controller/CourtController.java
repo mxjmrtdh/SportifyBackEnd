@@ -34,13 +34,15 @@ public class CourtController {
     }
 
     @GetMapping("/search")
-    public List<CourtDTO> getAllCourts() {
-        return courtService.getAllCourts();
+    public ResponseEntity<List<CourtDTO>> getAllCourts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(courtService.getAllCourts(page, size));
     }
 
     @GetMapping("/search/{id}")
-    public CourtDTO getCourtById(@PathVariable Long id) {
-        return courtService.getCourtById(id);
+    public ResponseEntity<CourtDTO> getCourtById(@PathVariable Long id) {
+        return ResponseEntity.ok(courtService.getCourtById(Math.toIntExact(id)));
     }
 
     @GetMapping("/random")

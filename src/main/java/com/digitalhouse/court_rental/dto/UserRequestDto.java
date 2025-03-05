@@ -11,9 +11,6 @@ import java.time.LocalDate;
 @Getter
 @Setter
 public class UserRequestDto {
-    @NotBlank(message = "Document is required")
-    private String document;
-
     @NotBlank(message = "Name is required")
     private String name;
 
@@ -35,7 +32,5 @@ public class UserRequestDto {
 
     private Integer statusId;
 
-    private Long cityId;
-
-    private Long idDocumentType;
+    private Long countryId;
 }

@@ -58,4 +58,11 @@ public class Court {
     @ManyToOne
     @JoinColumn(name = "id_status", nullable = false)
     private Status status;
+
+    @OneToMany(mappedBy = "court")
+    private List<ProductFeature> productFeatures;
+
+    public static Object builder() {
+        return null;
+    }
 }

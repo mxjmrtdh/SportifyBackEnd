@@ -2,6 +2,7 @@ package com.digitalhouse.court_rental.controller;
 
 import com.digitalhouse.court_rental.dto.CourtDTO;
 import com.digitalhouse.court_rental.dto.CourtRequestDTO;
+import com.digitalhouse.court_rental.dto.PagedResponse;
 import com.digitalhouse.court_rental.entity.Court;
 import com.digitalhouse.court_rental.service.CourtService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -34,7 +35,7 @@ public class CourtController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<CourtDTO>> getAllCourts(
+    public ResponseEntity<PagedResponse<CourtDTO>> getAllCourts(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         return ResponseEntity.ok(courtService.getAllCourts(page, size));

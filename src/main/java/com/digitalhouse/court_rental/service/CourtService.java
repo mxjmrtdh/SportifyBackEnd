@@ -2,21 +2,19 @@ package com.digitalhouse.court_rental.service;
 
 import com.digitalhouse.court_rental.dto.CourtDTO;
 import com.digitalhouse.court_rental.dto.CourtRequestDTO;
+import com.digitalhouse.court_rental.dto.PagedResponse;
 import com.digitalhouse.court_rental.entity.Court;
 import com.digitalhouse.court_rental.entity.Status;
 import com.digitalhouse.court_rental.entity.court.City;
 import com.digitalhouse.court_rental.entity.court.Sport;
 import com.digitalhouse.court_rental.repository.*;
-import com.digitalhouse.court_rental.service.ImgurService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.math.BigDecimal;
 
 @Service
@@ -69,9 +67,9 @@ public class CourtService {
         return courtRepository.save(court);
     }
 
-
-    public List<CourtDTO> getAllCourts(int page, int size) {
-        List<Object[]> results = courtRepository.getCourts(page - 1, size);
+    public PagedResponse<CourtDTO> getAllCourts(int page, int size) {
+        List<Object[]> results = courtRepository.getCourts(page -1, size);
+        List<CourtDTO> courts = new ArrayList<>();
         Map<Integer, CourtDTO> courtMap = new HashMap<>();
 
         results.forEach(obj -> {
@@ -110,8 +108,13 @@ public class CourtService {
             }
         });
 
-        return new ArrayList<>(courtMap.values());
+        courts.addAll(courtMap.values());
+
+        long totalElements = courtRepository.countTotalCourts();
+
+        return new PagedResponse<>(courts, page, size, totalElements);
     }
+
 
     public CourtDTO getCourtById(Integer id) {
         if (id == null) {

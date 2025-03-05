@@ -20,4 +20,6 @@ public class CourtDTO {
     private String address;
     private String neighborhood;
     private List<String> imageUrl;
+    private List<String> features;
+    private List<String> featuresImageUrl;
 }

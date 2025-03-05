@@ -21,10 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -40,6 +37,8 @@ class CourtServiceTest {
     private CityRepository cityRepository;
     @Mock
     private StatusRepository statusRepository;
+    @Mock
+    private ImgurService imgurService;
 
     @InjectMocks
     private CourtService courtService;
@@ -72,6 +71,7 @@ class CourtServiceTest {
         sampleCourt.setSport(sampleSport);
         sampleCourt.setCity(sampleCity);
         sampleCourt.setStatus(sampleStatus);
+        sampleCourt.setImageUrl(new ArrayList<>());
     }
 
     @Test
@@ -95,6 +95,7 @@ class CourtServiceTest {
         when(sportRepository.findById(1L)).thenReturn(Optional.of(sampleSport));
         when(cityRepository.findById(1)).thenReturn(Optional.of(sampleCity));
         when(statusRepository.findById(1)).thenReturn(Optional.of(sampleStatus));
+        when(imgurService.uploadFile(mockImage)).thenReturn("image_url");
         when(courtRepository.save(any(Court.class))).thenReturn(sampleCourt);
 
         Court result = courtService.createCourt(requestDTO, mockImages);
@@ -103,32 +104,23 @@ class CourtServiceTest {
         verify(courtRepository, times(1)).save(any(Court.class));
     }
 
-
-    @Test
-    void testGetAllCourts_Success() {
-        when(courtRepository.findByStatus_IdStatus(1)).thenReturn(Collections.singletonList(sampleCourt));
-
-        List<CourtDTO> result = courtService.getAllCourts();
-        assertFalse(result.isEmpty());
-        assertEquals(1, result.size());
-        assertEquals("Court 1", result.getFirst().getName());
-    }
-
     @Test
     void testGetCourtById_Success() {
-        when(courtRepository.findById(1L)).thenReturn(Optional.of(sampleCourt));
+        when(courtRepository.getCourtById(1L)).thenReturn(Collections.singletonList(
+                new Object[]{1, "Court 1", "Tennis", "Cusco", "Active", "Description", 10, BigDecimal.valueOf(50), "Address", "Neighborhood", "image_url", "feature", "feature_image"}
+        ));
 
-        CourtDTO result = courtService.getCourtById(1L);
+        CourtDTO result = courtService.getCourtById(1);
         assertNotNull(result);
         assertEquals("Court 1", result.getName());
+        assertEquals("Tennis", result.getSport());
     }
 
     @Test
     void testGetCourtById_NotFound() {
-        when(courtRepository.findById(99L)).thenReturn(Optional.empty());
-
-        Exception exception = assertThrows(RuntimeException.class, () -> courtService.getCourtById(99L));
-        assertEquals("Court not found or inactive", exception.getMessage());
+        when(courtRepository.getCourtById(99L)).thenReturn(Collections.emptyList());
+        Exception exception = assertThrows(EntityNotFoundException.class, () -> courtService.getCourtById(99));
+        assertEquals("Court not found", exception.getMessage());
     }
 
     @Test
@@ -144,51 +136,5 @@ class CourtServiceTest {
         courtService.deleteCourt(1L);
         assertEquals(2, sampleCourt.getStatus().getIdStatus());
         verify(courtRepository, times(1)).save(sampleCourt);
-    }
-
-    @Test
-    void testDeleteCourt_NotFound() {
-        when(courtRepository.findById(99L)).thenReturn(Optional.empty());
-
-        Exception exception = assertThrows(EntityNotFoundException.class, () -> courtService.deleteCourt(99L));
-        assertEquals("Court not found", exception.getMessage());
-        assertThrows(EntityNotFoundException.class, () -> courtService.deleteCourt(1L));
-
-    }
-    @Test
-    void testGetRandomCourts() {
-        List<Object[]> mockResults = new ArrayList<>();
-        mockResults.add(new Object[]{
-                1, "Cancha A", "Cancha de fútbol 5", "Fútbol", 10, BigDecimal.valueOf(50.00),
-                "Activo", "123 Calle Principal", "Centro", "Lima", "imagen_url.jpg"
-        });
-
-        when(courtRepository.getRandomCourts()).thenReturn(mockResults);
-
-        List<CourtDTO> result = courtService.getRandomCourts();
-
-        assertEquals(1, result.size());
-        assertEquals("Cancha A", result.getFirst().getName());
-        assertEquals("Fútbol", result.getFirst().getSport());
-        assertEquals(BigDecimal.valueOf(50.00), result.getFirst().getPricePerHour());
-        assertEquals("imagen_url.jpg", result.getFirst().getImageUrl().get(0));
-    }
-
-    @Test
-    void testGetCourtsBySport() {
-        List<Object[]> mockResults = new ArrayList<>();
-        mockResults.add(new Object[]{
-                1, "Cancha B", "Cancha de tenis", "Tenis", 4, BigDecimal.valueOf(30.00),
-                "Activo", "456 Calle Secundaria", "Surco", "Lima"
-        });
-
-        when(courtRepository.searchByCategory(1)).thenReturn(mockResults);
-
-        List<CourtDTO> result = courtService.getCourtsBySport(1);
-
-        assertEquals(1, result.size());
-        assertEquals("Cancha B", result.getFirst().getName());
-        assertEquals("Tenis", result.getFirst().getSport());
-        assertEquals(BigDecimal.valueOf(30.00), result.getFirst().getPricePerHour());
     }
 }

@@ -5,11 +5,7 @@ import com.digitalhouse.court_rental.dto.AuthResponseDTO;
 import com.digitalhouse.court_rental.dto.UserRequestDto;
 import com.digitalhouse.court_rental.entity.Rol;
 import com.digitalhouse.court_rental.entity.User;
-import com.digitalhouse.court_rental.entity.court.City;
-import com.digitalhouse.court_rental.entity.DocumentType;
 import com.digitalhouse.court_rental.enums.NameRol;
-import com.digitalhouse.court_rental.repository.CityRepository;
-import com.digitalhouse.court_rental.repository.DocumentTypeRepository;
 import com.digitalhouse.court_rental.repository.RolRepository;
 import com.digitalhouse.court_rental.repository.UserRepository;
 import com.digitalhouse.court_rental.util.JwtUtil;
@@ -18,6 +14,10 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import com.digitalhouse.court_rental.entity.court.Country;
+import com.digitalhouse.court_rental.repository.*;
+
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -28,13 +28,12 @@ import java.util.Set;
 public class UserService {
     private final UserRepository userRepository;
     private final RolRepository rolRepository;
-    private final CityRepository cityRepository;
     private final BCryptPasswordEncoder passwordEncoder;
-    private final DocumentTypeRepository documentTypeRepository;
 
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
 
+    private final CountryRepository countryRepository;
 
     public User registerUser(UserRequestDto  userRequestDto) {
 
@@ -42,14 +41,10 @@ public class UserService {
             throw new RuntimeException("The email is already registered.");
         }
 
-        DocumentType documentType = documentTypeRepository.findById(userRequestDto.getIdDocumentType())
-                .orElseThrow(() -> new RuntimeException("Document type not found"));
-
-        City city = cityRepository.findById(Math.toIntExact(userRequestDto.getCityId()))
-                .orElseThrow(() -> new RuntimeException("City not found"));
+        Country country = countryRepository.findById(Math.toIntExact(userRequestDto.getCountryId()))
+                .orElseThrow(() -> new RuntimeException("Country not found"));
 
         User user = new User();
-        user.setDocument(userRequestDto.getDocument());
         user.setName(userRequestDto.getName());
         user.setLastName(userRequestDto.getLastName());
         user.setEmail(userRequestDto.getEmail());
@@ -57,8 +52,7 @@ public class UserService {
         user.setPhoneNumber(userRequestDto.getPhoneNumber());
         user.setBirthdate(userRequestDto.getBirthdate());
         user.setRegistrationDate(LocalDateTime.now());
-        user.setCity(city);
-        user.setDocumentType(documentType);
+        user.setCountry(country);
         user.setStatusId(7);
 
         Rol rolUser = rolRepository.findByName(NameRol.ROLE_USER)

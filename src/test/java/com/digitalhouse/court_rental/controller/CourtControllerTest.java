@@ -2,6 +2,7 @@ package com.digitalhouse.court_rental.controller;
 
 import com.digitalhouse.court_rental.dto.CourtDTO;
 import com.digitalhouse.court_rental.dto.CourtRequestDTO;
+import com.digitalhouse.court_rental.dto.PagedResponse;
 import com.digitalhouse.court_rental.entity.Court;
 import com.digitalhouse.court_rental.service.CourtService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,7 +18,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.math.BigDecimal;
-import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.Matchers.*;
@@ -26,7 +26,6 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
 
 @ExtendWith(MockitoExtension.class)
 class CourtControllerTest {
@@ -44,19 +43,24 @@ class CourtControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(courtController).build();
         objectMapper = new ObjectMapper();
     }
+
     @Test
     void testGetAllCourts() throws Exception {
         CourtDTO courtDTO = new CourtDTO();
         courtDTO.setId(1);
         courtDTO.setName("Cancha A");
 
-        when(courtService.getAllCourts()).thenReturn(Collections.singletonList(courtDTO));
+        PagedResponse<CourtDTO> pagedResponse = new PagedResponse<>(
+                List.of(courtDTO), 0, 10, 1
+        );
+
+        when(courtService.getAllCourts(0, 10)).thenReturn(pagedResponse);
 
         mockMvc.perform(get("/api/public/courts/search"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].id").value(1))
-                .andExpect(jsonPath("$[0].name").value("Cancha A"));
+                .andExpect(jsonPath("$.data", hasSize(1)))
+                .andExpect(jsonPath("$.data[0].id").value(1))
+                .andExpect(jsonPath("$.data[0].name").value("Cancha A"));
     }
 
     @Test
@@ -64,8 +68,7 @@ class CourtControllerTest {
         CourtDTO courtDTO = new CourtDTO();
         courtDTO.setId(1);
         courtDTO.setName("Cancha A");
-
-        when(courtService.getCourtById(1L)).thenReturn(courtDTO);
+        when(courtService.getCourtById(1)).thenReturn(courtDTO);
 
         mockMvc.perform(get("/api/public/courts/search/1"))
                 .andExpect(status().isOk())
@@ -111,13 +114,15 @@ class CourtControllerTest {
                 .andExpect(jsonPath("$[0].id").value(1))
                 .andExpect(jsonPath("$[0].name").value("Cancha Aleatoria"));
     }
+
     @Test
     void testCreateCourt_MissingImage() throws Exception {
         CourtRequestDTO courtRequest = new CourtRequestDTO();
         courtRequest.setName("Cancha C");
 
+
         mockMvc.perform(multipart("/api/public/courts/add")
-                        .param("court", new ObjectMapper().writeValueAsString(courtRequest))
+                        .param("court", objectMapper.writeValueAsString(courtRequest))
                         .contentType(MediaType.MULTIPART_FORM_DATA))
                 .andExpect(status().isBadRequest());
     }
@@ -134,6 +139,7 @@ class CourtControllerTest {
         courtRequest.setSportId(1);
         courtRequest.setCityId(1);
         courtRequest.setStatusId(1);
+
 
         Court court = new Court();
         court.setIdCourt(1);
@@ -155,7 +161,4 @@ class CourtControllerTest {
                 .andExpect(jsonPath("$.idCourt").value(1))
                 .andExpect(jsonPath("$.courtName").value("Cancha A"));
     }
-
-
-
 }

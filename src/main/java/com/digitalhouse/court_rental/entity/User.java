@@ -1,6 +1,7 @@
 package com.digitalhouse.court_rental.entity;
 
 import com.digitalhouse.court_rental.entity.court.City;
+import com.digitalhouse.court_rental.entity.court.Country;
 import jakarta.persistence.*;
 import lombok.*;
 import com.digitalhouse.court_rental.entity.DocumentType;
@@ -24,9 +25,6 @@ public class User {
 
     @Column(name = "user_name", nullable = false)
     private String name;
-
-    @Column(name = "document", nullable = false)
-    private String document;
 
     @Column(name = "user_last_name", nullable = false)
     private String lastName;
@@ -59,11 +57,6 @@ public class User {
     private Set<Rol> roles = new HashSet<>();
 
     @ManyToOne
-    @JoinColumn(name = "id_city")
-    private City city;
-
-    @ManyToOne
-    @JoinColumn(name = "id_document_type")
-    private DocumentType documentType;
-
+    @JoinColumn(name = "id_country")
+    private Country country;
 }

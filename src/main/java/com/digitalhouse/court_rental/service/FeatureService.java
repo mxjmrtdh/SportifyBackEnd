@@ -1,24 +1,16 @@
 package com.digitalhouse.court_rental.service;
 
-import com.digitalhouse.court_rental.dto.CourtDTO;
-import com.digitalhouse.court_rental.dto.CourtRequestDTO;
 import com.digitalhouse.court_rental.dto.FeatureDTO;
 import com.digitalhouse.court_rental.dto.FeatureRequestDTO;
-import com.digitalhouse.court_rental.entity.Court;
 import com.digitalhouse.court_rental.entity.Feature;
 import com.digitalhouse.court_rental.entity.Status;
-import com.digitalhouse.court_rental.entity.court.City;
-import com.digitalhouse.court_rental.entity.court.Sport;
 import com.digitalhouse.court_rental.repository.FeatureRepository;
 import com.digitalhouse.court_rental.repository.StatusRepository;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -53,7 +45,7 @@ public class FeatureService {
         return convertToDTO(feature);
     }
 
-    public Feature add(FeatureRequestDTO featureRequest, List<MultipartFile> images) throws IOException {
+    public Feature add(FeatureRequestDTO featureRequest, List<MultipartFile> images) {
         Feature feature = new Feature();
         feature.setFeature(featureRequest.getFeature());
         feature.setImage_url(featureRequest.getImageUrl());
@@ -63,7 +55,7 @@ public class FeatureService {
         String imageLink = null;
         if (images != null && !images.isEmpty()) {
             try {
-                imageLink = imgurService.uploadFile(images.get(0));
+                imageLink = imgurService.uploadFile(images.getFirst());
             } catch (Exception e) {
                 e.printStackTrace();
             }

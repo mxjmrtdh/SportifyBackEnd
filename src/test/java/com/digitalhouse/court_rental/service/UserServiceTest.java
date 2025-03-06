@@ -5,13 +5,9 @@ import com.digitalhouse.court_rental.dto.AuthResponseDTO;
 import com.digitalhouse.court_rental.dto.UserRequestDto;
 import com.digitalhouse.court_rental.entity.Rol;
 import com.digitalhouse.court_rental.entity.User;
-import com.digitalhouse.court_rental.entity.court.City;
-import com.digitalhouse.court_rental.entity.DocumentType;
+import com.digitalhouse.court_rental.entity.court.Country;
 import com.digitalhouse.court_rental.enums.NameRol;
-import com.digitalhouse.court_rental.repository.CityRepository;
-import com.digitalhouse.court_rental.repository.DocumentTypeRepository;
-import com.digitalhouse.court_rental.repository.RolRepository;
-import com.digitalhouse.court_rental.repository.UserRepository;
+import com.digitalhouse.court_rental.repository.*;
 import com.digitalhouse.court_rental.util.JwtUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,6 +25,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -41,10 +38,7 @@ class UserServiceTest {
     private RolRepository rolRepository;
 
     @Mock
-    private CityRepository cityRepository;
-
-    @Mock
-    private DocumentTypeRepository documentTypeRepository;
+    private CountryRepository countryRepository;
 
     @Mock
     private BCryptPasswordEncoder passwordEncoder;
@@ -60,8 +54,6 @@ class UserServiceTest {
 
     private UserRequestDto userRequestDto;
     private User user;
-    private DocumentType documentType;
-    private City city;
     private Rol rol;
 
     @BeforeEach
@@ -71,13 +63,9 @@ class UserServiceTest {
         userRequestDto.setLastName("Doe");
         userRequestDto.setEmail("john@example.com");
         userRequestDto.setPassword("password123");
-        userRequestDto.setDocument("12345678");
-        userRequestDto.setIdDocumentType(1L);
-        userRequestDto.setCityId(1L);
         userRequestDto.setBirthdate(LocalDate.from(LocalDateTime.now()));
+        userRequestDto.setCountryId(1L);
 
-        documentType = new DocumentType();
-        city = new City();
         rol = new Rol();
         rol.setName(NameRol.ROLE_USER);
 
@@ -90,10 +78,13 @@ class UserServiceTest {
     @Test
     void registerUser_Success() {
         when(userRepository.existsByEmail(userRequestDto.getEmail())).thenReturn(false);
-        when(documentTypeRepository.findById(userRequestDto.getIdDocumentType())).thenReturn(Optional.of(documentType));
-        when(cityRepository.findById(Math.toIntExact(userRequestDto.getCityId()))).thenReturn(Optional.of(city));
         when(rolRepository.findByName(NameRol.ROLE_USER)).thenReturn(Optional.of(rol));
         when(passwordEncoder.encode(userRequestDto.getPassword())).thenReturn("encryptedPassword");
+
+        Country country = new Country();
+        country.setIdCountry(1);
+        when(countryRepository.findById(1)).thenReturn(Optional.of(country));
+
         when(userRepository.save(any(User.class))).thenReturn(user);
 
         User savedUser = userService.registerUser(userRequestDto);

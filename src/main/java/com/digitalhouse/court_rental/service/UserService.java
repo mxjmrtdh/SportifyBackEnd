@@ -8,8 +8,6 @@ import com.digitalhouse.court_rental.entity.User;
 import com.digitalhouse.court_rental.entity.court.Country;
 import com.digitalhouse.court_rental.enums.NameRol;
 import com.digitalhouse.court_rental.repository.*;
-import com.digitalhouse.court_rental.repository.CityRepository;
-import com.digitalhouse.court_rental.repository.DocumentTypeRepository;
 import com.digitalhouse.court_rental.repository.RolRepository;
 import com.digitalhouse.court_rental.repository.UserRepository;
 import com.digitalhouse.court_rental.util.JwtUtil;

@@ -1,11 +1,8 @@
 package com.digitalhouse.court_rental.entity;
 
-import com.digitalhouse.court_rental.entity.court.City;
 import com.digitalhouse.court_rental.entity.court.Country;
 import jakarta.persistence.*;
 import lombok.*;
-import com.digitalhouse.court_rental.entity.DocumentType;
-
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

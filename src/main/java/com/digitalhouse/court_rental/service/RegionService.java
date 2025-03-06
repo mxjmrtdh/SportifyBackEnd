@@ -4,7 +4,6 @@ import com.digitalhouse.court_rental.dto.RegionDTO;
 import com.digitalhouse.court_rental.entity.court.Region;
 import com.digitalhouse.court_rental.repository.RegionRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

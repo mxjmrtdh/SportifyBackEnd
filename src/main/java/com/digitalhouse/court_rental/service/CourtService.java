@@ -4,6 +4,8 @@ import com.digitalhouse.court_rental.dto.CourtDTO;
 import com.digitalhouse.court_rental.dto.CourtRequestDTO;
 import com.digitalhouse.court_rental.dto.PagedResponse;
 import com.digitalhouse.court_rental.entity.Court;
+import com.digitalhouse.court_rental.entity.Feature;
+import com.digitalhouse.court_rental.entity.ProductFeature;
 import com.digitalhouse.court_rental.entity.Status;
 import com.digitalhouse.court_rental.entity.court.City;
 import com.digitalhouse.court_rental.entity.court.Sport;
@@ -25,7 +27,8 @@ public class CourtService {
     private final CityRepository cityRepository;
     private final StatusRepository statusRepository;
     private final ImgurService imgurService;
-
+    private final FeatureRepository featureRepository;
+    private final ProductFeatureRepository productFeatureRepository;
 
     public Court createCourt(CourtRequestDTO courtRequest, List<MultipartFile> images) throws IOException {
         if (courtRepository.findByCourtName(courtRequest.getName()).isPresent()) {
@@ -51,6 +54,7 @@ public class CourtService {
         court.setCity(city);
         court.setStatus(status);
 
+        // Subir imágenes
         List<String> imageLinks = new ArrayList<>();
         if (images != null) {
             for (MultipartFile image : images) {
@@ -64,7 +68,25 @@ public class CourtService {
         }
         court.setImageUrl(imageLinks);
 
-        return courtRepository.save(court);
+        // Guardar la cancha en la base de datos
+        Court savedCourt = courtRepository.save(court);
+
+        // Asociar las características (product_features) al guardar la cancha
+        if (courtRequest.getFeatureIds() != null) {
+            for (Integer featureId : courtRequest.getFeatureIds()) {
+                Feature feature = featureRepository.findById(Long.valueOf(featureId))
+                        .orElseThrow(() -> new RuntimeException("Feature not found"));
+
+                ProductFeature productFeature = new ProductFeature();
+                productFeature.setCourt(savedCourt);
+                productFeature.setFeature(feature);
+
+                // Aquí deberías tener un repositorio para `ProductFeature`
+                productFeatureRepository.save(productFeature); // Guarda la relación en la tabla `product_feature`
+            }
+        }
+
+        return savedCourt;
     }
 
     public PagedResponse<CourtDTO> getAllCourts(int page, int size) {

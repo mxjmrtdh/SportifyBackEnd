@@ -19,4 +19,5 @@ public class CourtRequestDTO {
     private BigDecimal pricePerHour;
     private String address;
     private String neighborhood;
+    private List<Integer> featureIds;
 }

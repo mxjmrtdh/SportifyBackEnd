@@ -29,15 +29,16 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtUtil jwtUtil, UserDetailsService userDetailsService) throws Exception {
         http
+                .cors(cors -> cors.configure(http)) // Habilita CORS en Spring Security
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**", "/api/public/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/user/**").hasAnyRole("SUPER_ADMIN", "ADMIN")
-                        .requestMatchers("/api/roles/**").hasRole("SUPER_ADMIN")
+                        .requestMatchers("/api/roles/**").hasAnyRole("SUPER_ADMIN", "ADMIN")
                         .anyRequest().authenticated()
                 )
-                .addFilterBefore((Filter) new JwtAuthFilter(jwtUtil, userDetailsService), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtAuthFilter(jwtUtil, userDetailsService), UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         return http.build();

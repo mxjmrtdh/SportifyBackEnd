@@ -68,10 +68,8 @@ public class CourtService {
         }
         court.setImageUrl(imageLinks);
 
-        // Guardar la cancha en la base de datos
         Court savedCourt = courtRepository.save(court);
 
-        // Asociar las características (product_features) al guardar la cancha
         if (courtRequest.getFeatureIds() != null) {
             for (Integer featureId : courtRequest.getFeatureIds()) {
                 Feature feature = featureRepository.findById(Long.valueOf(featureId))
@@ -81,8 +79,7 @@ public class CourtService {
                 productFeature.setCourt(savedCourt);
                 productFeature.setFeature(feature);
 
-                // Aquí deberías tener un repositorio para `ProductFeature`
-                productFeatureRepository.save(productFeature); // Guarda la relación en la tabla `product_feature`
+                productFeatureRepository.save(productFeature);
             }
         }
 

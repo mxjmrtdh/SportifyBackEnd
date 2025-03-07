@@ -36,15 +36,16 @@ public class FeatureController {
 
     @PostMapping(value = "/features/add", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<Feature> createFeature(
-            @RequestPart("feature")  String featuresJson,
-            @RequestPart("images") List<MultipartFile> images) throws IOException {
+            @RequestPart("feature") FeatureRequestDTO featureRequestDTO, // Directamente recibimos el DTO
+            @RequestPart("images") List<MultipartFile> images) {
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        FeatureRequestDTO featureRequestDTO = objectMapper.readValue(featuresJson, FeatureRequestDTO.class);
+        // Llamamos al servicio para agregar la nueva característica
+        Feature newFeature = featureService.add(featureRequestDTO, images);
 
-        Feature newFeature = featureService.add(featureRequestDTO,images);
+        // Retornamos la respuesta con el objeto creado
         return ResponseEntity.status(HttpStatus.CREATED).body(newFeature);
     }
+
 
     @PutMapping("/features/{id}/deactivate")
     public ResponseEntity<String> deactivate(@PathVariable int id) {

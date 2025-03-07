@@ -17,12 +17,12 @@ public class RoleService {
     private final UserRepository userRepository;
     private final RolRepository rolRepository;
 
-    public void updateUserRole(String  superAdminId, Long userId, NameRol newRole) {
-        User superAdmin = userRepository.findByEmail(superAdminId)
-                .orElseThrow(() -> new RuntimeException("SuperAdmin not found"));
+    public void updateUserRole(String adminEmail, Long userId, NameRol newRole) {
+        User adminUser = userRepository.findByEmail(adminEmail)
+                .orElseThrow(() -> new RuntimeException("Admin not found"));
 
-        if (!superAdminHasPermission(superAdmin)) {
-            throw new RuntimeException("Only SUPER_ADMIN can change user roles");
+        if (!hasPermissionToChangeRoles(adminUser)) {
+            throw new RuntimeException("Only SUPER_ADMIN and ADMIN can change user roles");
         }
 
         User user = userRepository.findById(userId)
@@ -44,9 +44,8 @@ public class RoleService {
         userRepository.save(user);
     }
 
-    private boolean superAdminHasPermission(User user) {
+    private boolean hasPermissionToChangeRoles(User user) {
         return user.getRoles().stream()
-                .anyMatch(role -> role.getName() == NameRol.ROLE_SUPER_ADMIN);
+                .anyMatch(role -> role.getName() == NameRol.ROLE_SUPER_ADMIN || role.getName() == NameRol.ROLE_ADMIN);
     }
-
 }

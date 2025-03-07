@@ -12,11 +12,12 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/roles")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:5173")
 public class RoleController {
     private final RoleService roleService;
 
     @PutMapping("/update/{userId}")
-    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
     public ResponseEntity<String> updateUserRole(@PathVariable Long userId, @RequestParam NameRol newRole) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String superAdminEmail = authentication.getName();

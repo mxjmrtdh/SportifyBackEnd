@@ -1,5 +1,6 @@
 package com.digitalhouse.court_rental.dto;
 
+import com.digitalhouse.court_rental.entity.User;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -11,8 +12,6 @@ import java.time.LocalDate;
 @Getter
 @Setter
 public class UserDTO {
-    @NotBlank(message = "Document is required")
-    private String document;
 
     @NotBlank(message = "Name is required")
     private String name;
@@ -35,7 +34,13 @@ public class UserDTO {
 
     private Integer statusId;
 
-    private Long cityId;
-
-    private Long idDocumentType;
+    public UserDTO(User user) {
+        this.name = user.getName();
+        this.lastName = user.getLastName();
+        this.email = user.getEmail();
+        this.password = user.getPassword();
+        this.phoneNumber = user.getPhoneNumber();
+        this.birthdate = user.getBirthdate();
+        this.statusId = user.getStatusId();
+    }
 }

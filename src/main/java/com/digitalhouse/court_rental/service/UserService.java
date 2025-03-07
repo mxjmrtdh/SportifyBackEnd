@@ -2,6 +2,7 @@ package com.digitalhouse.court_rental.service;
 
 import com.digitalhouse.court_rental.dto.AuthRequestDTO;
 import com.digitalhouse.court_rental.dto.AuthResponseDTO;
+import com.digitalhouse.court_rental.dto.UserDTO;
 import com.digitalhouse.court_rental.dto.UserRequestDto;
 import com.digitalhouse.court_rental.entity.Rol;
 import com.digitalhouse.court_rental.entity.User;
@@ -19,7 +20,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -79,6 +82,11 @@ public class UserService {
 
         final String jwt = jwtUtil.generateToken(authRequest.getEmail(), role);
         return new AuthResponseDTO(jwt, user.getName()+" "+user.getLastName(),role);
+    }
+
+    public List<UserDTO> getAllUsers() {
+        List<User> users = userRepository.findAll();
+        return users.stream().map(UserDTO::new).collect(Collectors.toList());
     }
 
 }

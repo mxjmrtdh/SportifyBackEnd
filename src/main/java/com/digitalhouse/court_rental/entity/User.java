@@ -57,4 +57,8 @@ public class User {
     @ManyToOne
     @JoinColumn(name = "id_country")
     private Country country;
+
+    public User(Long id_user) {
+        this.id_user = id_user;
+    }
 }

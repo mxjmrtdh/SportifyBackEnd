@@ -32,11 +32,11 @@ public class SecurityConfig {
                 .cors(cors -> cors.configure(http)) // Habilita CORS en Spring Security
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**", "/api/public/**").permitAll()
+                        .requestMatchers("/api/auth/**", "/api/public/**", "api/bookings/search").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/user/**").hasAnyRole("SUPER_ADMIN", "ADMIN")
                         .requestMatchers("/api/roles/**").hasAnyRole("SUPER_ADMIN", "ADMIN")
-                        .requestMatchers("/api/bookings/**").hasAnyRole("SUPER_ADMIN", "ADMIN", "USER")
+                        .requestMatchers("/api/bookings/create").hasAnyRole("SUPER_ADMIN", "ADMIN", "USER")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(new JwtAuthFilter(jwtUtil, userDetailsService), UsernamePasswordAuthenticationFilter.class)

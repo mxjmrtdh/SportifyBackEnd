@@ -1,5 +1,6 @@
 package com.digitalhouse.court_rental.entity.court;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -19,7 +20,7 @@ public class Region {
 
     @ManyToOne
     @JoinColumn(name = "id_country")
-    @JsonManagedReference
+    @JsonBackReference
     private Country country;
 
     @OneToMany(mappedBy = "region")

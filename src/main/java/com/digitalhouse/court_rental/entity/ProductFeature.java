@@ -1,5 +1,6 @@
 package com.digitalhouse.court_rental.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,6 +17,7 @@ public class ProductFeature {
 
     @ManyToOne
     @JoinColumn(name = "id_court")
+    @JsonBackReference
     private Court court;
 
     @ManyToOne

@@ -2,12 +2,13 @@ package com.digitalhouse.court_rental.entity;
 
 import com.digitalhouse.court_rental.entity.court.City;
 import com.digitalhouse.court_rental.entity.court.Sport;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.web.multipart.MultipartFile;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -60,9 +61,18 @@ public class Court {
     private Status status;
 
     @OneToMany(mappedBy = "court")
+    @JsonManagedReference
     private List<ProductFeature> productFeatures;
 
     public static Object builder() {
         return null;
+    }
+
+    @OneToMany(mappedBy = "court")
+    @JsonBackReference
+    private List<Booking> bookings;
+
+    public Court(int idCourt) {
+        this.idCourt = idCourt;
     }
 }

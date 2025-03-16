@@ -1,11 +1,17 @@
 package com.digitalhouse.court_rental.service;
 
+import com.digitalhouse.court_rental.config.CourtSpecification;
+import com.digitalhouse.court_rental.dto.BookingDTO;
 import com.digitalhouse.court_rental.entity.Booking;
 import com.digitalhouse.court_rental.entity.Court;
 import com.digitalhouse.court_rental.entity.User;
 import com.digitalhouse.court_rental.repository.BookingRepository;
 import com.digitalhouse.court_rental.repository.CourtRepository;
+import com.digitalhouse.court_rental.repository.UserRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -19,43 +25,48 @@ public class BookingService {
 
     private BookingRepository bookingRepository;
     private CourtRepository courtRepository;
+    private final UserRepository userRepository;
 
-    public List<Court> searchAvailableCourts(int cityId, int sportId, LocalDate date, LocalTime startTime, LocalTime endTime) {
-        return courtRepository.searchAvailableCourts(cityId, sportId, date, startTime, endTime);
+    public List<Court> searchAvailableCourts(Integer  cityId, Integer  sportId, LocalDate date, LocalTime startTime, LocalTime endTime) {
+        Specification<Court> spec = CourtSpecification.searchCourts(cityId, sportId, date, startTime, endTime);
+        return courtRepository.findAll(spec);
+        //return courtRepository.searchAvailableCourts(cityId, sportId, date, startTime, endTime);
     }
 
+    public Booking createBooking(BookingDTO bookingDTO, Authentication authentication) {
+        User authenticatedUser = getAuthenticatedUser(authentication);
 
-    public boolean isCourtAvailable(int courtId, LocalDate bookingDate, LocalTime startTime, LocalTime endTime) {
-        return !bookingRepository.existsOverlappingBooking(courtId, bookingDate, startTime, endTime);
-    }
+        Court court = courtRepository.findById((long) bookingDTO.getCourtId())
+                .orElseThrow(() -> new RuntimeException("Cancha no encontrada"));
 
-    public Booking createBooking(Booking booking, User authenticatedUser) {
-
-        if (!authenticatedUser.getId_user().equals(booking.getUser().getId_user())) {
-            throw new RuntimeException("No puedes reservar en nombre de otro usuario.");
-        }
-
-        boolean available = isCourtAvailable(
-                booking.getCourt().getIdCourt(),
-                booking.getBookingDate(),
-                booking.getStartTime(),
-                booking.getEndTime()
-        );
-
+        boolean available = isCourtAvailable(court.getIdCourt(), bookingDTO.getBookingDate(), bookingDTO.getStartTime(), bookingDTO.getEndTime());
         if (!available) {
             throw new RuntimeException("La cancha ya está reservada en ese horario.");
         }
 
-        if (booking.getCapacity() == null) {
-            booking.setCapacity(1);
-        }
-
-        Court court = courtRepository.findById((long) booking.getCourt().getIdCourt())
-                .orElseThrow(() -> new RuntimeException("Cancha no encontrada"));
+        Booking booking = new Booking();
+        booking.setUser(authenticatedUser);
         booking.setCourt(court);
-
+        booking.setBookingDate(bookingDTO.getBookingDate());
+        booking.setStartTime(bookingDTO.getStartTime());
+        booking.setEndTime(bookingDTO.getEndTime());
+        booking.setCapacity(bookingDTO.getCapacity() != null ? bookingDTO.getCapacity() : 1);
         booking.setRegistrationDate(LocalDateTime.now());
 
         return bookingRepository.save(booking);
+    }
+
+    private boolean isCourtAvailable(int courtId, LocalDate bookingDate, LocalTime startTime, LocalTime endTime) {
+        return !bookingRepository.existsOverlappingBooking(courtId, bookingDate, startTime, endTime);
+    }
+
+    private User getAuthenticatedUser(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new RuntimeException("Usuario no autenticado.");
+        }
+
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        return userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("No se pudo recuperar el usuario autenticado."));
     }
 }

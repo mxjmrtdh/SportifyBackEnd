@@ -1,19 +1,16 @@
 package com.digitalhouse.court_rental.repository;
 
-import com.digitalhouse.court_rental.entity.Booking;
 import com.digitalhouse.court_rental.entity.Court;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
-public interface CourtRepository extends JpaRepository<Court, Long> {
+public interface CourtRepository extends JpaRepository<Court, Long>, JpaSpecificationExecutor<Court> {
     Optional<Court> findByCourtName(String courtName);
 
     @Query(value = "CALL GetCourts(:page, :size)", nativeQuery = true)
@@ -37,16 +34,18 @@ public interface CourtRepository extends JpaRepository<Court, Long> {
     @Query(value = "CALL searchByCategory(:sportId)", nativeQuery = true)
     List<Object[]> searchByCategory(@Param("sportId") int sportId);
 
-    @Query("SELECT c FROM Court c WHERE c.city.id = :cityId " +
-            "AND c.sport.id = :sportId AND c.status.idStatus = 1 " +
-            "AND NOT EXISTS (SELECT b FROM Booking b WHERE b.court = c " +
-            "AND b.bookingDate = :bookingDate " +
-            "AND ((b.startTime < :endTime AND b.endTime > :startTime)))")
-    List<Court> searchAvailableCourts(@Param("cityId") int cityId,
-                                      @Param("sportId") int sportId,
+    /*
+    @Query("SELECT c FROM Court c WHERE "
+            + "(:cityId IS NULL OR c.city.id = :cityId) "
+            + "AND (:sportId IS NULL OR c.sport.id = :sportId) "
+            + "AND (:bookingDate IS NULL OR NOT EXISTS (SELECT b FROM Booking b WHERE b.court = c AND b.bookingDate = :bookingDate "
+            + "AND (:startTime IS NULL OR b.startTime < :endTime) "
+            + "AND (:endTime IS NULL OR b.endTime > :startTime)))")
+    List<Court> searchAvailableCourts(@Param("cityId") Integer  cityId,
+                                      @Param("sportId") Integer  sportId,
                                       @Param("bookingDate") LocalDate bookingDate,
                                       @Param("startTime") LocalTime startTime,
                                       @Param("endTime") LocalTime endTime);
 
-
+     */
 }

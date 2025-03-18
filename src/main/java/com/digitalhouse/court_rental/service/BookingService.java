@@ -3,6 +3,7 @@ package com.digitalhouse.court_rental.service;
 import com.digitalhouse.court_rental.config.CourtSpecification;
 import com.digitalhouse.court_rental.dto.BookingDTO;
 import com.digitalhouse.court_rental.dto.CourtDTO;
+import com.digitalhouse.court_rental.dto.PagedResponse;
 import com.digitalhouse.court_rental.entity.Booking;
 import com.digitalhouse.court_rental.entity.Court;
 import com.digitalhouse.court_rental.entity.User;
@@ -31,15 +32,23 @@ public class BookingService {
     private CourtRepository courtRepository;
     private final UserRepository userRepository;
 
-    public List<CourtDTO> searchAvailableCourts(Integer page, Integer size, List<Integer> sportId, List<Integer> cityId, LocalDate date, LocalTime time) {
-        String sportIdStr = (sportId != null && !sportId.isEmpty()) ? String.join(",", sportId.stream().map(String::valueOf).toArray(String[]::new)) : null;
-        String cityIdStr = (cityId != null && !cityId.isEmpty()) ? String.join(",", cityId.stream().map(String::valueOf).toArray(String[]::new)) : null;
+    public PagedResponse<CourtDTO> searchAvailableCourts(
+            Integer page, Integer size, List<Integer> sportId, List<Integer> cityId, LocalDate date, LocalTime time) {
 
-        List<Object[]> results = courtRepository.getCourtsByFilters(page -1, size, sportIdStr, cityIdStr, date, time);
-        List<CourtDTO> courts = new ArrayList<>();
+        String sportIdStr = (sportId != null && !sportId.isEmpty())
+                ? String.join(",", sportId.stream().map(String::valueOf).toArray(String[]::new))
+                : null;
+
+        String cityIdStr = (cityId != null && !cityId.isEmpty())
+                ? String.join(",", cityId.stream().map(String::valueOf).toArray(String[]::new))
+                : null;
+
+        List<Object[]> results = courtRepository.getCourtsByFilters(page - 1, size, sportIdStr, cityIdStr, date, time);
+        long totalElements = results.isEmpty() ? 0 : ((Number) results.get(0)[13]).longValue();
+
         Map<Integer, CourtDTO> courtMap = new HashMap<>();
 
-        results.forEach(obj -> {
+        for (Object[] obj : results) {
             int courtId = obj[0] instanceof Integer ? (Integer) obj[0] : Integer.parseInt(obj[0].toString());
 
             CourtDTO dto = courtMap.computeIfAbsent(courtId, id -> {
@@ -69,12 +78,15 @@ public class BookingService {
             if (obj[12] != null && !dto.getFeaturesImageUrl().contains(obj[12].toString())) {
                 dto.getFeaturesImageUrl().add(obj[12].toString());
             }
-        });
+        }
 
-        courts.addAll(courtMap.values());
-        return courts;
+        return new PagedResponse<>(
+                new ArrayList<>(courtMap.values()),
+                page,
+                size,
+                totalElements
+        );
     }
-
 
     public Booking createBooking(BookingDTO bookingDTO, Authentication authentication) {
         User authenticatedUser = getAuthenticatedUser(authentication);

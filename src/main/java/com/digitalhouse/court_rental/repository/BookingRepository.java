@@ -30,5 +30,14 @@ public interface BookingRepository extends JpaRepository<Booking, Long>{
 
     @Query("SELECT b.bookingDate FROM Booking b WHERE b.court.id = :courtId")
     List<LocalDate> findReservedDatesByCourt(@Param("courtId") Long courtId);
+
+    @Query("""
+    SELECT b.startTime FROM Booking b 
+    WHERE b.court.id = :courtId AND b.bookingDate = :bookingDate""")
+    List<LocalTime> findReservedTimesByCourtAndDate(
+            @Param("courtId") Long courtId,
+            @Param("bookingDate") LocalDate bookingDate
+    );
+
 }
 

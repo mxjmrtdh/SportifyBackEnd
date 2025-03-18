@@ -12,4 +12,5 @@ import lombok.Setter;
 public class SportDTO {
     private Long id;
     private String name;
+    private String icon;
 }

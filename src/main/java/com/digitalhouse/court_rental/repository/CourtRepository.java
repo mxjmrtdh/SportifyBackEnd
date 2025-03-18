@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,6 +36,16 @@ public interface CourtRepository extends JpaRepository<Court, Long>, JpaSpecific
     @Query(value = "CALL searchByCategory(:sportId)", nativeQuery = true)
     List<Object[]> searchByCategory(@Param("sportId") int sportId);
 
+    @Query(value = "CALL court_booking.GetCourtsByFilters(:page, :size, :sportId, :cityId, :date, :time)", nativeQuery = true)
+    List<Object[]> getCourtsByFilters(
+            @Param("page") int page,
+            @Param("size") int size,
+            @Param("sportId") String sportId,
+            @Param("cityId") String cityId,
+            @Param("date") LocalDate date,
+            @Param("time") LocalTime time
+    );
+
     /*
     @Query("SELECT c FROM Court c WHERE "
             + "(:cityId IS NULL OR c.city.id = :cityId) "
@@ -48,4 +60,5 @@ public interface CourtRepository extends JpaRepository<Court, Long>, JpaSpecific
                                       @Param("endTime") LocalTime endTime);
 
      */
+
 }

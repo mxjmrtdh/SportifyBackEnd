@@ -22,4 +22,10 @@ public class CityController {
         List<CityDTO> cities = cityService.findByRegionId(idRegion);
         return ResponseEntity.ok(cities);
     }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<CityDTO>> getAllCities() {
+        List<CityDTO> cities = cityService.findAllCities();
+        return ResponseEntity.ok(cities);
+    }
 }

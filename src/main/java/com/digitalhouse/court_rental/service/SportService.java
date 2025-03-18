@@ -18,7 +18,7 @@ public class SportService {
 
         List<Sport> sports = sportRepository.findByStatusId(statusId);
         return sports.stream()
-                .map(sport -> new SportDTO((long) sport.getIdSport(), sport.getSportName()))
+                .map(sport -> new SportDTO((long) sport.getIdSport(), sport.getSportName(), sport.getIcon()))
                 .collect(Collectors.toList());
     }
 }

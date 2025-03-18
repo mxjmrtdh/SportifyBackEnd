@@ -8,6 +8,7 @@ import com.digitalhouse.court_rental.entity.Court;
 import com.digitalhouse.court_rental.service.BookingService;
 import lombok.AllArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @AllArgsConstructor
@@ -46,6 +48,17 @@ public class BookingController {
             return ResponseEntity.ok(newBooking);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/{courtId}/availability")
+    public ResponseEntity<?> getAvailability(@PathVariable Long courtId) {
+        try {
+            Map<String, List<LocalDate>> availability = bookingService.getAvailability(courtId);
+            return ResponseEntity.ok(availability);
+        } catch (Exception e) {
+            return ResponseEntity.status(   HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al obtener disponibilidad. Intente más tarde.");
         }
     }
 }

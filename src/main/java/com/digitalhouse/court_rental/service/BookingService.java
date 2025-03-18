@@ -127,25 +127,40 @@ public class BookingService {
                 .orElseThrow(() -> new RuntimeException("No se pudo recuperar el usuario autenticado."));
     }
 
-    public Map<String, List<LocalDate>> getAvailability(Long courtId) {
-        List<LocalDate> reservedDates = bookingRepository.findReservedDatesByCourt(courtId);
+    public Map<String, Map<LocalDate, List<LocalTime>>> getAvailability(Long courtId) {
+        Map<LocalDate, List<LocalTime>> availableSlots = new HashMap<>();
+        Map<LocalDate, List<LocalTime>> reservedSlots = new HashMap<>();
 
-        // Simulación: generamos fechas disponibles en un mes desde hoy
         LocalDate today = LocalDate.now();
         LocalDate endDate = today.plusMonths(1);
-        List<LocalDate> availableDates = new ArrayList<>();
+
+        List<LocalDate> reservedDates = bookingRepository.findReservedDatesByCourt(courtId);
 
         for (LocalDate date = today; date.isBefore(endDate); date = date.plusDays(1)) {
-            if (!reservedDates.contains(date)) {
-                availableDates.add(date);
+            List<LocalTime> reservedTimes = bookingRepository.findReservedTimesByCourtAndDate(courtId, date);
+            List<LocalTime> availableTimes = new ArrayList<>();
+
+            for (int hour = 7; hour < 22; hour++) {
+                LocalTime timeSlot = LocalTime.of(hour, 0);
+
+                if (reservedTimes.contains(timeSlot)) {
+                    reservedSlots.computeIfAbsent(date, k -> new ArrayList<>()).add(timeSlot);
+                } else {
+                    availableTimes.add(timeSlot);
+                }
+            }
+
+            if (!availableTimes.isEmpty()) {
+                availableSlots.put(date, availableTimes);
             }
         }
 
-        // Respuesta con fechas disponibles y reservadas
-        Map<String, List<LocalDate>> response = new HashMap<>();
-        response.put("availableDates", availableDates);
-        response.put("reservedDates", reservedDates);
+        Map<String, Map<LocalDate, List<LocalTime>>> response = new HashMap<>();
+        response.put("availableSlots", availableSlots);
+        response.put("reservedSlots", reservedSlots);
 
         return response;
     }
+
+
 }

@@ -51,11 +51,12 @@ public class BookingController {
     @GetMapping("/{courtId}/availability")
     public ResponseEntity<?> getAvailability(@PathVariable Long courtId) {
         try {
-            Map<String, List<LocalDate>> availability = bookingService.getAvailability(courtId);
+            Map<String, Map<LocalDate, List<LocalTime>>> availability = bookingService.getAvailability(courtId);
             return ResponseEntity.ok(availability);
         } catch (Exception e) {
-            return ResponseEntity.status(   HttpStatus.INTERNAL_SERVER_ERROR)
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error al obtener disponibilidad. Intente más tarde.");
         }
     }
+
 }

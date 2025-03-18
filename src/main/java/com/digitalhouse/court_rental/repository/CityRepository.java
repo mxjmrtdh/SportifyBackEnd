@@ -9,4 +9,7 @@ import java.util.List;
 public interface CityRepository extends JpaRepository<City, Integer> {
     @Query("SELECT c FROM City c WHERE c.region.id = :idRegion")
     List<City> findByRegionId(@Param("idRegion") Integer idRegion);
+
+    @Query("SELECT c FROM City c JOIN FETCH c.region r JOIN FETCH r.country")
+    List<City> findAllCities();
 }

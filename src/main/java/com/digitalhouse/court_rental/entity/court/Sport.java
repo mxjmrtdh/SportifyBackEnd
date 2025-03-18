@@ -19,4 +19,6 @@ public class Sport {
     @ManyToOne
     @JoinColumn(name = "id_status")
     private Status status;
+
+    private String icon;
 }

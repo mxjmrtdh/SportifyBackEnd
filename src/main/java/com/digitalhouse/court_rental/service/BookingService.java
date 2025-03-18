@@ -20,6 +20,8 @@ import java.util.stream.Collectors;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.*;
 import java.math.BigDecimal;
@@ -123,5 +125,27 @@ public class BookingService {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         return userRepository.findByEmail(userDetails.getUsername())
                 .orElseThrow(() -> new RuntimeException("No se pudo recuperar el usuario autenticado."));
+    }
+
+    public Map<String, List<LocalDate>> getAvailability(Long courtId) {
+        List<LocalDate> reservedDates = bookingRepository.findReservedDatesByCourt(courtId);
+
+        // Simulación: generamos fechas disponibles en un mes desde hoy
+        LocalDate today = LocalDate.now();
+        LocalDate endDate = today.plusMonths(1);
+        List<LocalDate> availableDates = new ArrayList<>();
+
+        for (LocalDate date = today; date.isBefore(endDate); date = date.plusDays(1)) {
+            if (!reservedDates.contains(date)) {
+                availableDates.add(date);
+            }
+        }
+
+        // Respuesta con fechas disponibles y reservadas
+        Map<String, List<LocalDate>> response = new HashMap<>();
+        response.put("availableDates", availableDates);
+        response.put("reservedDates", reservedDates);
+
+        return response;
     }
 }

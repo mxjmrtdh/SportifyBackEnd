@@ -43,9 +43,11 @@ public class AuthController {
             var jwtToken = authService.login(authRequestDto.getEmail(), authRequestDto.getPassword());
             // Crea un objeto de respuesta con el token y el estado de éxito
             var authResponseDto = new AuthResponseDto(
-                    jwtToken,
+                    jwtToken.getToken(),
                     AuthStatus.LOGIN_SUCCESS,
-                    "Inicio de sesion exitoso"
+                    "Inicio de sesion exitoso",
+                    jwtToken.getFullName(),
+                    jwtToken.getRole()
             );
 
             return ResponseEntity
@@ -64,7 +66,7 @@ public class AuthController {
                 errorMessage = "Usuario o contraseña incorrectos";
             }
 
-            var authResponseDto = new AuthResponseDto(null, status, errorMessage);
+            var authResponseDto = new AuthResponseDto(null, status, errorMessage,null,null);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(authResponseDto);
         }
     }
@@ -83,9 +85,11 @@ public class AuthController {
             // Llama al servicio para registrar al usuario y generar un token JWT.
             var jwtToken = authService.signUp(authRequestDto);
             // Crea un objeto de respuesta con el token y el estado de éxito.
-            var authResponseDto = new AuthResponseDto(jwtToken,
+            var authResponseDto = new AuthResponseDto(null,
                     AuthStatus.USER_CREATED_SUCCESSFULLY,
-                    "Usuario creado con exito. Por favor, revise, tu correo electronico y verifica tu cuenta para completar el registro");
+                    "Usuario creado con exito. Por favor, revise, tu correo electronico y verifica tu cuenta para completar el registro",
+                    jwtToken.getName() + " " + jwtToken.getLastName(),
+                    jwtToken.getRoles().toString());
 
             return ResponseEntity
                     .status(HttpStatus.OK)
@@ -102,7 +106,7 @@ public class AuthController {
                 errorMessage = "El correo electrónico ya está registrado";
             }
 
-            var authResponseDto = new AuthResponseDto(null, status, errorMessage);
+            var authResponseDto = new AuthResponseDto(null, status, errorMessage,null,null);
 
             return ResponseEntity
                     .status(HttpStatus.CONFLICT)

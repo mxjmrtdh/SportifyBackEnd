@@ -3,10 +3,15 @@ package com.digitalhouse.court_rental.service.Auth;
 import com.digitalhouse.court_rental.Listener.RegistrationCompleteEvent;
 import com.digitalhouse.court_rental.Repo.UserRepo;
 import com.digitalhouse.court_rental.controller.AuthRequestDto;
+import com.digitalhouse.court_rental.controller.AuthResponseDto;
+import com.digitalhouse.court_rental.dto.AuthResponseDTO;
 import com.digitalhouse.court_rental.dto.CountryDTO;
+import com.digitalhouse.court_rental.entity.Rol;
 import com.digitalhouse.court_rental.entity.User;
 import com.digitalhouse.court_rental.entity.court.Country;
+import com.digitalhouse.court_rental.enums.NameRol;
 import com.digitalhouse.court_rental.repository.CountryRepository;
+import com.digitalhouse.court_rental.repository.RolRepository;
 import com.digitalhouse.court_rental.service.CountryService;
 import com.digitalhouse.court_rental.token.VerificationToken;
 import com.digitalhouse.court_rental.token.VerificationTokenRepository;
@@ -23,7 +28,9 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Calendar;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +44,9 @@ public class AuthServiceImpl implements AuthService {
 
     @Autowired
     private final CountryRepository countryRepository;
+
+    @Autowired
+    private final RolRepository rolRepository;
 
     @Autowired
     private VerificationTokenRepository tokenRepository;
@@ -53,10 +63,9 @@ public class AuthServiceImpl implements AuthService {
      * @return El token JWT generado.
      */
     @Override
-    public String login(String email, String password) {
+    public AuthResponseDTO login(String email, String password) {
         // Busca al usuario en la base de datos
         Optional<User> optionalUser = userRepo.findByEmail(email);
-        System.out.println("llego al user de la implemencion de auth service" + optionalUser);
         if (optionalUser.isEmpty()) {
             throw new RuntimeException("Usuario no encontrado");
         }
@@ -74,8 +83,13 @@ public class AuthServiceImpl implements AuthService {
         // Autentica al usuario utilizando el AuthenticationManager
         var authenticate = authenticationManager.authenticate(authToken);
 
+        //Obtenemos los roles del usuario
+        String role = user.getRoles().iterator().next().getName().name();
+
         // Genera y devuelve un token JWT utilizando el nombre de usuario autenticado.
-        return JwtUtils.generateToken(((UserDetails) (authenticate.getPrincipal())).getUsername());
+        final String jwt = JwtUtils.generateToken(((UserDetails) (authenticate.getPrincipal())).getUsername());
+
+        return new AuthResponseDTO(jwt,user.getName() + " " + user.getLastName(), role);
     }
 
     /**
@@ -109,7 +123,7 @@ public class AuthServiceImpl implements AuthService {
      * ya están en uso.
      */
     @Override
-    public String signUp(AuthRequestDto authRequestDto) {
+    public User signUp(AuthRequestDto authRequestDto) {
         // Verificar si el email ya existe
         if (userRepo.existsByEmail(authRequestDto.getEmail())) {
             throw new RuntimeException("El correo electrónico ya existe");
@@ -132,12 +146,20 @@ public class AuthServiceImpl implements AuthService {
         user.setRegistrationDate(LocalDateTime.now());
         user.setStatusId(7); // Asegurarnos que empiece habilitado
 
+        //Asignamos los roles
+        Rol rolUser = rolRepository.findByName(NameRol.ROLE_USER)
+                .orElseThrow(() -> new RuntimeException("Role not found"));
+
+        Set<Rol> roles = new HashSet<>();
+        roles.add(rolUser);
+        user.setRoles(roles);
+
         user = userRepo.save(user);
 
         // Aquí deberías publicar el evento de registro
         eventPublisher.publishEvent(new RegistrationCompleteEvent(user, "..."));
 
-        return "Verification email sent"; // No devolver JWT hasta verificación
+        return user;
     }
 
     @Override

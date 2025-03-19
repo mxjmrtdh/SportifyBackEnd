@@ -45,6 +45,7 @@ public class SecurityFilterChainConfig {
                                 .requestMatchers("/admin/**").hasAnyRole("ADMIN")// Permite el acceso público a las rutas de registro.
                                 .requestMatchers("/api/auth/verifyEmail/**").permitAll()
                                 .requestMatchers("/api/user/**").hasAnyRole("SUPER_ADMIN", "ADMIN")
+                                .requestMatchers("/api/public/users/all/**").hasAnyRole("SUPER_ADMIN", "ADMIN")
                                 .requestMatchers("/api/roles/**").hasAnyRole("SUPER_ADMIN", "ADMIN")
                                 .anyRequest().authenticated() // Requiere autenticación para cualquier otra solicitud.
                 )

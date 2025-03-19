@@ -1,15 +1,16 @@
 package com.digitalhouse.court_rental.service.Auth;
 
 import com.digitalhouse.court_rental.controller.AuthRequestDto;
+import com.digitalhouse.court_rental.dto.AuthResponseDTO;
 import com.digitalhouse.court_rental.entity.User;
 
 import java.time.LocalDate;
 import java.util.Optional;
 
 public interface AuthService {
-    String login(String email, String password);
+    AuthResponseDTO login(String email, String password);
 
-    String signUp(AuthRequestDto authRequestDto);
+    User signUp(AuthRequestDto authRequestDto);
 
     String verifyToken(String token);
 

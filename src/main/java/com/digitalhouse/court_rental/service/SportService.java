@@ -1,6 +1,8 @@
 package com.digitalhouse.court_rental.service;
 
 import com.digitalhouse.court_rental.dto.SportDTO;
+import com.digitalhouse.court_rental.dto.SportRequestDTO;
+import com.digitalhouse.court_rental.entity.Status;
 import com.digitalhouse.court_rental.entity.court.Sport;
 import com.digitalhouse.court_rental.repository.SportRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +20,28 @@ public class SportService {
 
         List<Sport> sports = sportRepository.findByStatusId(statusId);
         return sports.stream()
-                .map(sport -> new SportDTO((long) sport.getIdSport(), sport.getSportName(), sport.getIcon()))
+                .map(sport -> new SportDTO((long) sport.getIdSport(), sport.getSportName(), sport.getIcon(), sport.getDescription()))
                 .collect(Collectors.toList());
+    }
+
+    public void createSport(SportRequestDTO sportRequestDTO) {
+        Sport sport = new Sport();
+        sport.setSportName(sportRequestDTO.getName());
+        sport.setIcon(sportRequestDTO.getIcon());
+        sport.setDescription(sportRequestDTO.getDescription());
+
+        Status status = new Status();
+        status.setIdStatus(5);
+        sport.setStatus(status);
+
+        sportRepository.save(sport);
+    }
+
+    public String updateSportAndCourtState(int sportId) {
+        try {
+            return sportRepository.updateSportAndCourtState(sportId);
+        } catch (Exception e) {
+            throw new RuntimeException("Error al actualizar el estado del deporte: " + e.getMessage());
+        }
     }
 }

@@ -24,6 +24,7 @@ import java.util.List;
 public class FeatureController {
 
     private final FeatureService featureService;
+    private final ObjectMapper objectMapper;
     @GetMapping("/features")
     public List<FeatureDTO> getAll() {
             return featureService.getAll();
@@ -36,16 +37,15 @@ public class FeatureController {
 
     @PostMapping(value = "/features/add", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<Feature> createFeature(
-            @RequestPart("feature") FeatureRequestDTO featureRequestDTO, // Directamente recibimos el DTO
-            @RequestPart("images") List<MultipartFile> images) {
+            @RequestPart("feature") String featureJson,
+            @RequestPart(value = "images", required = false) List<MultipartFile> images) throws IOException {
 
-        // Llamamos al servicio para agregar la nueva característica
-        Feature newFeature = featureService.add(featureRequestDTO, images);
+        ObjectMapper objectMapper = new ObjectMapper();
+        FeatureRequestDTO featureRequest = objectMapper.readValue(featureJson, FeatureRequestDTO.class);
 
-        // Retornamos la respuesta con el objeto creado
+        Feature newFeature = featureService.addFeature(featureRequest, images);
         return ResponseEntity.status(HttpStatus.CREATED).body(newFeature);
     }
-
 
     @PutMapping("/features/{id}/deactivate")
     public ResponseEntity<String> deactivate(@PathVariable int id) {

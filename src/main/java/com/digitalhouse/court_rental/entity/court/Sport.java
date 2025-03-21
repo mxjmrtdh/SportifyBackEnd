@@ -21,4 +21,6 @@ public class Sport {
     private Status status;
 
     private String icon;
+
+    private String description;
 }

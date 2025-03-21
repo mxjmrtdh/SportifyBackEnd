@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -45,25 +46,29 @@ public class FeatureService {
         return convertToDTO(feature);
     }
 
-    public Feature add(FeatureRequestDTO featureRequest, List<MultipartFile> images) {
+    public Feature addFeature(FeatureRequestDTO featureRequest, List<MultipartFile> images) throws IOException {
         Feature feature = new Feature();
         feature.setFeature(featureRequest.getFeature());
-        feature.setImage_url(featureRequest.getImageUrl());
+
         Status status = statusRepository.findById(featureRequest.getStatusId())
-            .orElseThrow(() -> new RuntimeException("Status not found"));
+                .orElseThrow(() -> new RuntimeException("Status not found"));
         feature.setStatus(status);
-        String imageLink = null;
-        if (images != null && !images.isEmpty()) {
-            try {
-                imageLink = imgurService.uploadFile(images.getFirst());
-            } catch (Exception e) {
-                e.printStackTrace();
+
+        // Subir imagen a Imgur y guardar URL
+        if (images != null) {
+            for (MultipartFile image : images) {
+                try {
+                    String imageLink = imgurService.uploadFile(image);
+                    feature.setImage_url(imageLink);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    throw new RuntimeException("Error uploading image: " + e.getMessage());
+                }
             }
         }
-        feature.setImage_url(imageLink);
 
         return featureRepository.save(feature);
-}
+    }
 
     @Transactional
     public void updateStatus(Long id) {

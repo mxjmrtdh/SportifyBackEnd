@@ -7,6 +7,5 @@ import lombok.Setter;
 @Setter
 public class FeatureRequestDTO {
     private String feature;
-    private String imageUrl;
     private int statusId;
 }

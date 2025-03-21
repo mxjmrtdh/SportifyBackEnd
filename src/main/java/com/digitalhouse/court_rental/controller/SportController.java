@@ -1,8 +1,11 @@
 package com.digitalhouse.court_rental.controller;
 
 import com.digitalhouse.court_rental.dto.SportDTO;
+import com.digitalhouse.court_rental.dto.SportRequestDTO;
 import com.digitalhouse.court_rental.service.SportService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,4 +21,26 @@ public class SportController {
     public List<SportDTO> getSportsByStatusFive() {
         return sportService.findByStatusFive();
     }
+
+    @PostMapping("/add")
+    public ResponseEntity<String> createSport(@RequestBody SportRequestDTO sportRequestDTO) {
+        try {
+            sportService.createSport(sportRequestDTO);
+            return ResponseEntity.ok("Deporte creado exitosamente");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al crear el deporte: " + e.getMessage());
+        }
+    }
+
+    @PutMapping("/update-status/{sportId}")
+    public ResponseEntity<String> updateSportStatus(@PathVariable int sportId) {
+        try {
+            String result = sportService.updateSportAndCourtState(sportId);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al actualizar el deporte: " + e.getMessage());
+        }
+    }
+
 }

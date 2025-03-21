@@ -21,7 +21,7 @@ import java.util.Map;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/api/bookings")
+@RequestMapping("/api/public/bookings")
 public class BookingController {
 
     private final BookingService bookingService;

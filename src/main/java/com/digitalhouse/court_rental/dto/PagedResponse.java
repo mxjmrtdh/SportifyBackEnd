@@ -20,7 +20,7 @@ public class PagedResponse<T> {
         this.pageSize = pageSize;
         this.totalElements = totalElements;
         this.totalPages = (int) Math.ceil((double) totalElements / pageSize);
-        this.hasNextPage = currentPage < totalPages - 1;
-        this.hasPrevPage = currentPage > 0;
+        this.hasNextPage = currentPage < totalPages;
+        this.hasPrevPage = currentPage > 1;
     }
 }

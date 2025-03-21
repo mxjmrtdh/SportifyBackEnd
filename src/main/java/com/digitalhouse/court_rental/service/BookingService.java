@@ -2,6 +2,8 @@ package com.digitalhouse.court_rental.service;
 
 import com.digitalhouse.court_rental.config.CourtSpecification;
 import com.digitalhouse.court_rental.dto.BookingDTO;
+import com.digitalhouse.court_rental.dto.CourtDTO;
+import com.digitalhouse.court_rental.dto.PagedResponse;
 import com.digitalhouse.court_rental.entity.Booking;
 import com.digitalhouse.court_rental.entity.Court;
 import com.digitalhouse.court_rental.entity.User;
@@ -13,6 +15,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import java.util.stream.Collectors;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -20,7 +23,8 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.math.BigDecimal;
 
 @Service
 @AllArgsConstructor
@@ -30,10 +34,60 @@ public class BookingService {
     private CourtRepository courtRepository;
     private final UserRepository userRepository;
 
-    public List<Court> searchAvailableCourts(Integer  cityId, Integer  sportId, LocalDate date, LocalTime startTime, LocalTime endTime) {
-        Specification<Court> spec = CourtSpecification.searchCourts(cityId, sportId, date, startTime, endTime);
-        return courtRepository.findAll(spec);
-        //return courtRepository.searchAvailableCourts(cityId, sportId, date, startTime, endTime);
+    public PagedResponse<CourtDTO> searchAvailableCourts(
+            Integer page, Integer size, List<Integer> sportId, List<Integer> cityId, LocalDate date, LocalTime time) {
+
+        String sportIdStr = (sportId != null && !sportId.isEmpty())
+                ? String.join(",", sportId.stream().map(String::valueOf).toArray(String[]::new))
+                : null;
+
+        String cityIdStr = (cityId != null && !cityId.isEmpty())
+                ? String.join(",", cityId.stream().map(String::valueOf).toArray(String[]::new))
+                : null;
+
+        List<Object[]> results = courtRepository.getCourtsByFilters(page - 1, size, sportIdStr, cityIdStr, date, time);
+        long totalElements = results.isEmpty() ? 0 : ((Number) results.get(0)[13]).longValue();
+
+        Map<Integer, CourtDTO> courtMap = new HashMap<>();
+
+        for (Object[] obj : results) {
+            int courtId = obj[0] instanceof Integer ? (Integer) obj[0] : Integer.parseInt(obj[0].toString());
+
+            CourtDTO dto = courtMap.computeIfAbsent(courtId, id -> {
+                CourtDTO newDto = new CourtDTO();
+                newDto.setId(courtId);
+                newDto.setName((String) obj[1]);
+                newDto.setSport((String) obj[2]);
+                newDto.setCity((String) obj[3]);
+                newDto.setStatus((String) obj[4]);
+                newDto.setDescription((String) obj[5]);
+                newDto.setCapacity((Integer) obj[6]);
+                newDto.setPricePerHour((BigDecimal) obj[7]);
+                newDto.setAddress((String) obj[8]);
+                newDto.setNeighborhood((String) obj[9]);
+                newDto.setImageUrl(new ArrayList<>());
+                newDto.setFeatures(new ArrayList<>());
+                newDto.setFeaturesImageUrl(new ArrayList<>());
+                return newDto;
+            });
+
+            if (obj[10] != null && !dto.getImageUrl().contains(obj[10].toString())) {
+                dto.getImageUrl().add(obj[10].toString());
+            }
+            if (obj[11] != null && !dto.getFeatures().contains(obj[11].toString())) {
+                dto.getFeatures().add(obj[11].toString());
+            }
+            if (obj[12] != null && !dto.getFeaturesImageUrl().contains(obj[12].toString())) {
+                dto.getFeaturesImageUrl().add(obj[12].toString());
+            }
+        }
+
+        return new PagedResponse<>(
+                new ArrayList<>(courtMap.values()),
+                page,
+                size,
+                totalElements
+        );
     }
 
     public Booking createBooking(BookingDTO bookingDTO, Authentication authentication) {

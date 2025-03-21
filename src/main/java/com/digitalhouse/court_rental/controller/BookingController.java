@@ -1,6 +1,8 @@
 package com.digitalhouse.court_rental.controller;
 
 import com.digitalhouse.court_rental.dto.BookingDTO;
+import com.digitalhouse.court_rental.dto.CourtDTO;
+import com.digitalhouse.court_rental.dto.PagedResponse;
 import com.digitalhouse.court_rental.entity.Booking;
 import com.digitalhouse.court_rental.entity.Court;
 import com.digitalhouse.court_rental.service.BookingService;
@@ -22,18 +24,19 @@ import java.util.Map;
 @RequestMapping("/api/bookings")
 public class BookingController {
 
-    private BookingService bookingService;
+    private final BookingService bookingService;
 
     @GetMapping("/search")
-    public ResponseEntity<List<Court>> searchAvailableCourts(
-            @RequestParam(required = false) Integer  cityId,
-            @RequestParam(required = false) Integer  sportId,
+    public ResponseEntity<PagedResponse<CourtDTO>> searchAvailableCourts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) List<Integer> sportId,
+            @RequestParam(required = false) List<Integer> cityId,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime startTime,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime endTime) {
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime time) {
 
-        List<Court> courts = bookingService.searchAvailableCourts(cityId, sportId, date, startTime, endTime);
-        return ResponseEntity.ok(courts);
+        PagedResponse<CourtDTO> response = bookingService.searchAvailableCourts(page, size, sportId, cityId, date, time);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping(value = "/create", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)

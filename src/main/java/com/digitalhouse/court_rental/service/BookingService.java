@@ -1,6 +1,5 @@
 package com.digitalhouse.court_rental.service;
 
-import com.digitalhouse.court_rental.config.CourtSpecification;
 import com.digitalhouse.court_rental.dto.BookingDTO;
 import com.digitalhouse.court_rental.dto.CourtDTO;
 import com.digitalhouse.court_rental.dto.PagedResponse;
@@ -11,11 +10,9 @@ import com.digitalhouse.court_rental.repository.BookingRepository;
 import com.digitalhouse.court_rental.repository.CourtRepository;
 import com.digitalhouse.court_rental.repository.UserRepository;
 import lombok.AllArgsConstructor;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import java.util.stream.Collectors;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -46,7 +43,7 @@ public class BookingService {
                 : null;
 
         List<Object[]> results = courtRepository.getCourtsByFilters(page - 1, size, sportIdStr, cityIdStr, date, time);
-        long totalElements = results.isEmpty() ? 0 : ((Number) results.get(0)[13]).longValue();
+        long totalElements = results.isEmpty() ? 0 : ((Number) results.getFirst()[13]).longValue();
 
         Map<Integer, CourtDTO> courtMap = new HashMap<>();
 
@@ -133,8 +130,6 @@ public class BookingService {
 
         LocalDate today = LocalDate.now();
         LocalDate endDate = today.plusMonths(1);
-
-        List<LocalDate> reservedDates = bookingRepository.findReservedDatesByCourt(courtId);
 
         for (LocalDate date = today; date.isBefore(endDate); date = date.plusDays(1)) {
             List<LocalTime> reservedTimes = bookingRepository.findReservedTimesByCourtAndDate(courtId, date);

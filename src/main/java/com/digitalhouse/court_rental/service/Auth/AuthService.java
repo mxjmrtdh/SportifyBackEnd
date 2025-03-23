@@ -1,10 +1,9 @@
 package com.digitalhouse.court_rental.service.Auth;
 
-import com.digitalhouse.court_rental.controller.AuthRequestDto;
+import com.digitalhouse.court_rental.dto.AuthRequestDto;
 import com.digitalhouse.court_rental.dto.AuthResponseDTO;
 import com.digitalhouse.court_rental.entity.User;
 
-import java.time.LocalDate;
 import java.util.Optional;
 
 public interface AuthService {

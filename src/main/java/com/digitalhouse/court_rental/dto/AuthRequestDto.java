@@ -1,5 +1,6 @@
 package com.digitalhouse.court_rental.controller;
 
+import com.digitalhouse.court_rental.enums.AuthStatus;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -36,4 +37,12 @@ public class AuthRequestDto{
     private Integer statusId;
 
     private Long countryId;
+
+    public static record AuthResponseDto(
+            String token,// Contiene el token JWT generado si la autenticación o el registro fueron exitosos.
+            AuthStatus authStatus,// Representa el estado de la operación de autenticación o registro.
+            String message,
+            String fullName,
+            String role) {
+    }
 }

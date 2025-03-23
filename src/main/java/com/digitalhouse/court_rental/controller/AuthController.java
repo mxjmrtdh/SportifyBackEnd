@@ -37,12 +37,12 @@ public class AuthController {
      * @return Respuesta HTTP con un token JWT y el estado de autenticación.
      */
     @PostMapping("/login") // Define que este método manejará solicitudes POST a "/api/auth/login".
-    public ResponseEntity<AuthResponseDto> login(@RequestBody AuthRequestDto authRequestDto) {
+    public ResponseEntity<com.digitalhouse.court_rental.controller.AuthRequestDto.AuthResponseDto> login(@RequestBody AuthRequestDto authRequestDto) {
         try {
             // Llama al servicio para autenticar al usuario y generar un token JWT
             var jwtToken = authService.login(authRequestDto.getEmail(), authRequestDto.getPassword());
             // Crea un objeto de respuesta con el token y el estado de éxito
-            var authResponseDto = new AuthResponseDto(
+            var authResponseDto = new com.digitalhouse.court_rental.controller.AuthRequestDto.AuthResponseDto(
                     jwtToken.getToken(),
                     AuthStatus.LOGIN_SUCCESS,
                     "Inicio de sesion exitoso",
@@ -66,7 +66,7 @@ public class AuthController {
                 errorMessage = "Usuario o contraseña incorrectos";
             }
 
-            var authResponseDto = new AuthResponseDto(null, status, errorMessage,null,null);
+            var authResponseDto = new com.digitalhouse.court_rental.controller.AuthRequestDto.AuthResponseDto(null, status, errorMessage,null,null);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(authResponseDto);
         }
     }
@@ -80,12 +80,12 @@ public class AuthController {
      * mensaje de error si no.
      */
     @PostMapping("/register") // Define que este método manejará solicitudes POST
-    public ResponseEntity<AuthResponseDto> signUp(@RequestBody AuthRequestDto authRequestDto) {
+    public ResponseEntity<com.digitalhouse.court_rental.controller.AuthRequestDto.AuthResponseDto> signUp(@RequestBody AuthRequestDto authRequestDto) {
         try {
             // Llama al servicio para registrar al usuario y generar un token JWT.
             var jwtToken = authService.signUp(authRequestDto);
             // Crea un objeto de respuesta con el token y el estado de éxito.
-            var authResponseDto = new AuthResponseDto(null,
+            var authResponseDto = new com.digitalhouse.court_rental.controller.AuthRequestDto.AuthResponseDto(null,
                     AuthStatus.USER_CREATED_SUCCESSFULLY,
                     "Usuario creado con exito. Por favor, revise, tu correo electronico y verifica tu cuenta para completar el registro",
                     jwtToken.getName() + " " + jwtToken.getLastName(),
@@ -106,7 +106,7 @@ public class AuthController {
                 errorMessage = "El correo electrónico ya está registrado";
             }
 
-            var authResponseDto = new AuthResponseDto(null, status, errorMessage,null,null);
+            var authResponseDto = new com.digitalhouse.court_rental.controller.AuthRequestDto.AuthResponseDto(null, status, errorMessage,null,null);
 
             return ResponseEntity
                     .status(HttpStatus.CONFLICT)

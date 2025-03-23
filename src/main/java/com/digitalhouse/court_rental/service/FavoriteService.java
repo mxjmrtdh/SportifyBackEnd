@@ -34,9 +34,9 @@ public class FavoriteService {
         }
     }
 
-    public List<Court> getUserFavorites(Long userId) {
-        return favoriteRepository.findByUserId(userId).stream()
-                .map(Favorite::getCourt)
-                .collect(Collectors.toList());
+    public List<Court> getUserFavorites(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        return favoriteRepository.findCourtsByUserId(user.getId_user());
     }
 }

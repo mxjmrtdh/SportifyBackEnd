@@ -21,7 +21,7 @@ public class Favorite {
     @JoinColumn(name = "id_court", nullable = false)
     private Court court;
 
-    //public Favorite() {}
+    public Favorite() {}
 
     public Favorite(User user, Court court) {
         this.user = user;

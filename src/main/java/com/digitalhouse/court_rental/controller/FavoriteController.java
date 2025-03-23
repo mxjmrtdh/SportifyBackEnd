@@ -31,14 +31,14 @@ public class FavoriteController {
         return ResponseEntity.ok("Estado de favorito actualizado");
     }
 
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<List<Court>> getUserFavorites() {
         User user = getAuthenticatedUser();
         if (user == null) {
             return ResponseEntity.status(401).body(null);
         }
 
-        return ResponseEntity.ok(favoriteService.getUserFavorites(user.getId_user()));
+        return ResponseEntity.ok(favoriteService.getUserFavorites(user.getEmail()));
     }
 
     private User getAuthenticatedUser() {
@@ -47,8 +47,8 @@ public class FavoriteController {
             return null;
         }
 
-        String email = authentication.getName(); // Obtener email desde el token
-        return userService.findByEmail(email).orElse(null); // Buscar usuario en la base de datos
+        String email = authentication.getName();
+        return userService.findByEmail(email).orElse(null);
     }
 
 }

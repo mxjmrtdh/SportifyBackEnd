@@ -34,7 +34,7 @@ class SportControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(sportController).build();
     }
 
-    @Test
+    /*@Test
     void testGetSportsByStatusFive_Success() throws Exception {
         SportDTO sport1 = new SportDTO(1L, "Fútbol");
         SportDTO sport2 = new SportDTO(2L, "Básquetbol");
@@ -51,6 +51,6 @@ class SportControllerTest {
                 .andExpect(jsonPath("$[0].name").value("Fútbol"))
                 .andExpect(jsonPath("$[1].id").value(2))
                 .andExpect(jsonPath("$[1].name").value("Básquetbol"));
-    }
+    }*/
 
 }

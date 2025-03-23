@@ -14,7 +14,7 @@ public class ImgurService {
     @Value("${imgur.client.id}")  // Debes agregar esta propiedad en application.properties
     private String clientId;
 
-    private final String IMGUR_UPLOAD_URL = "https://api.imgur.com/3/upload";
+    private static final String IMGUR_UPLOAD_URL = "https://api.imgur.com/3/upload";
 
     public String uploadFile(MultipartFile file) {
         try {

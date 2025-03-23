@@ -1,33 +1,32 @@
 package com.digitalhouse.court_rental.controller;
 
+import com.digitalhouse.court_rental.dto.AuthResponseDTO;
 import com.digitalhouse.court_rental.enums.AuthStatus;
 import com.digitalhouse.court_rental.service.Auth.AuthService;
 import com.digitalhouse.court_rental.service.Auth.AuthServiceImpl;
 import com.digitalhouse.court_rental.token.VerificationToken;
 import com.digitalhouse.court_rental.token.VerificationTokenRepository;
+import com.digitalhouse.court_rental.dto.AuthRequestDto;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 @RequestMapping("/api/auth")
 public class AuthController {
-    @Autowired
-    private AuthService authService; // Inyección de dependencia del servicio encargado de la lógica de autenticación.
-    @Autowired
-    private VerificationTokenRepository tokenRepository;
-
-    @Autowired
-    private AuthServiceImpl userService;
-
+    private final AuthService authService; // Inyección de dependencia del servicio encargado de la lógica de autenticación.
+    private final VerificationTokenRepository tokenRepository;
+    private final AuthServiceImpl userService;
 
     /**
      * Endpoint para el inicio de sesión (login).
@@ -37,17 +36,17 @@ public class AuthController {
      * @return Respuesta HTTP con un token JWT y el estado de autenticación.
      */
     @PostMapping("/login") // Define que este método manejará solicitudes POST a "/api/auth/login".
-    public ResponseEntity<com.digitalhouse.court_rental.controller.AuthRequestDto.AuthResponseDto> login(@RequestBody AuthRequestDto authRequestDto) {
+    public ResponseEntity<AuthResponseDTO> login(@RequestBody AuthRequestDto authRequestDto) {
         try {
             // Llama al servicio para autenticar al usuario y generar un token JWT
             var jwtToken = authService.login(authRequestDto.getEmail(), authRequestDto.getPassword());
             // Crea un objeto de respuesta con el token y el estado de éxito
-            var authResponseDto = new com.digitalhouse.court_rental.controller.AuthRequestDto.AuthResponseDto(
+            var authResponseDto = new AuthResponseDTO(
                     jwtToken.getToken(),
-                    AuthStatus.LOGIN_SUCCESS,
-                    "Inicio de sesion exitoso",
                     jwtToken.getFullName(),
-                    jwtToken.getRole()
+                    jwtToken.getRole(),
+                    "Inicio de sesion exitoso",
+                    AuthStatus.LOGIN_SUCCESS
             );
 
             return ResponseEntity
@@ -55,19 +54,7 @@ public class AuthController {
                     .body(authResponseDto);
 
         } catch (Exception e) {
-            String errorMessage = e.getMessage();
-            AuthStatus status = AuthStatus.LOGIN_FAILED;
-
-            if (errorMessage.contains("Usuario no encontrado")) {
-                errorMessage = "Usuario no encontrado";
-            } else if (errorMessage.contains("La cuenta no ha sido verificada")) {
-                errorMessage = "La cuenta no ha sido verificada. Por favor, revise su correo electrónico.";
-            } else if (errorMessage.contains("Bad credentials")) {
-                errorMessage = "Usuario o contraseña incorrectos";
-            }
-
-            var authResponseDto = new com.digitalhouse.court_rental.controller.AuthRequestDto.AuthResponseDto(null, status, errorMessage,null,null);
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(authResponseDto);
+            return buildErrorResponse(e);
         }
     }
 
@@ -80,37 +67,26 @@ public class AuthController {
      * mensaje de error si no.
      */
     @PostMapping("/register") // Define que este método manejará solicitudes POST
-    public ResponseEntity<com.digitalhouse.court_rental.controller.AuthRequestDto.AuthResponseDto> signUp(@RequestBody AuthRequestDto authRequestDto) {
+    public ResponseEntity<AuthResponseDTO> signUp(@RequestBody AuthRequestDto authRequestDto) {
         try {
             // Llama al servicio para registrar al usuario y generar un token JWT.
             var jwtToken = authService.signUp(authRequestDto);
             // Crea un objeto de respuesta con el token y el estado de éxito.
-            var authResponseDto = new com.digitalhouse.court_rental.controller.AuthRequestDto.AuthResponseDto(null,
-                    AuthStatus.USER_CREATED_SUCCESSFULLY,
-                    "Usuario creado con exito. Por favor, revise, tu correo electronico y verifica tu cuenta para completar el registro",
-                    jwtToken.getName() + " " + jwtToken.getLastName(),
-                    jwtToken.getRoles().toString());
+            var authResponseDto = AuthResponseDTO.builder()
+                    .fullName(jwtToken.getName() + " " + jwtToken.getLastName())
+                    .role(jwtToken.getRoles().toString())
+                    .message("Usuario creado con éxito. Por favor, revise su correo electrónico y verifique su cuenta para completar el registro.")
+                    .authStatus(AuthStatus.USER_CREATED_SUCCESSFULLY)
+                    .build();
+
 
             return ResponseEntity
                     .status(HttpStatus.OK)
                     .body(authResponseDto);
 
         } catch (Exception e) {
-            String errorMessage = e.getMessage();
-            AuthStatus status = AuthStatus.USER_NOT_CREATED;
+            return buildErrorResponse(e);
 
-            // Personalizar mensajes según el tipo de error
-            if (e.getMessage().contains("Username already exists")) {
-                errorMessage = "El nombre de usuario ya está en uso";
-            } else if (e.getMessage().contains("Email already exists")) {
-                errorMessage = "El correo electrónico ya está registrado";
-            }
-
-            var authResponseDto = new com.digitalhouse.court_rental.controller.AuthRequestDto.AuthResponseDto(null, status, errorMessage,null,null);
-
-            return ResponseEntity
-                    .status(HttpStatus.CONFLICT)
-                    .body(authResponseDto);
         }
     }
 
@@ -151,10 +127,8 @@ public class AuthController {
                     response.sendRedirect("http://localhost:3000/verification?status=invalid-token");
             }
         } catch (Exception e) {
-            // Si ocurre algún error durante el proceso de verificación, se captura la excepción
-            // Se imprime el mensaje del error en la consola y se redirige al usuario a una página de error
-            System.out.println("Error durante la verificación: " + e.getMessage());
-            e.printStackTrace();
+            log.error("Error durante la verificación: {}", e.getMessage(), e);
+
             response.sendRedirect("http://localhost:3000/verification?status=error");
         }
     }
@@ -163,4 +137,24 @@ public class AuthController {
         // Construye la URL completa del servidor (incluye el nombre del servidor, puerto y contexto) para usarla en la verificación por correo
         return "http://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
     }
+
+    private ResponseEntity<AuthResponseDTO> buildErrorResponse(Exception e) {
+        Map<String, String> errorMessages = Map.of(
+                "Usuario no encontrado", "Usuario no encontrado",
+                "La cuenta no ha sido verificada", "La cuenta no ha sido verificada. Por favor, revise su correo electrónico.",
+                "Bad credentials", "Usuario o contraseña incorrectos",
+                "Username already exists", "El nombre de usuario ya está en uso",
+                "Email already exists", "El correo electrónico ya está registrado"
+        );
+
+        String errorMessage = errorMessages.entrySet().stream()
+                .filter(entry -> e.getMessage().contains(entry.getKey()))
+                .map(Map.Entry::getValue)
+                .findFirst()
+                .orElse(e.getMessage());
+
+        var authResponseDto = new AuthResponseDTO(null, null, null, errorMessage, AuthStatus.LOGIN_FAILED);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(authResponseDto);
+    }
+
 }

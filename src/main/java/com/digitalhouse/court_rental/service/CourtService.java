@@ -12,15 +12,16 @@ import com.digitalhouse.court_rental.entity.court.Sport;
 import com.digitalhouse.court_rental.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.*;
 import java.math.BigDecimal;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CourtService {
     private final CourtRepository courtRepository;
     private final SportRepository sportRepository;
@@ -30,7 +31,7 @@ public class CourtService {
     private final FeatureRepository featureRepository;
     private final ProductFeatureRepository productFeatureRepository;
 
-    public Court createCourt(CourtRequestDTO courtRequest, List<MultipartFile> images) throws IOException {
+    public Court createCourt(CourtRequestDTO courtRequest, List<MultipartFile> images) {
         if (courtRepository.findByCourtName(courtRequest.getName()).isPresent()) {
             throw new IllegalArgumentException("La cancha ya está registrada");
         }
@@ -62,7 +63,7 @@ public class CourtService {
                     String link = imgurService.uploadFile(image);
                     imageLinks.add(link);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    log.error("Error al subir imagen a Imgur", e);
                 }
             }
         }
@@ -88,7 +89,6 @@ public class CourtService {
 
     public PagedResponse<CourtDTO> getAllCourts(int page, int size) {
         List<Object[]> results = courtRepository.getCourts(page -1, size);
-        List<CourtDTO> courts = new ArrayList<>();
         Map<Integer, CourtDTO> courtMap = new HashMap<>();
 
         results.forEach(obj -> {
@@ -127,7 +127,7 @@ public class CourtService {
             }
         });
 
-        courts.addAll(courtMap.values());
+        List<CourtDTO> courts = new ArrayList<>(courtMap.values());
 
         long totalElements = courtRepository.countTotalCourts();
 
@@ -179,30 +179,10 @@ public class CourtService {
             }
         }
 
-        if (courtDTO == null) {
-            throw new EntityNotFoundException("Court not found");
-        }
-
         courtDTO.setImageUrl(new ArrayList<>(images));
         courtDTO.setFeatures(new ArrayList<>(features.keySet()));
         courtDTO.setFeaturesImageUrl(new ArrayList<>(featuresImageUrl.keySet()));
 
-        return courtDTO;
-    }
-
-    private CourtDTO convertToDTO(Court court) {
-        CourtDTO courtDTO = new CourtDTO();
-        courtDTO.setId(court.getIdCourt());
-        courtDTO.setName(court.getCourtName());
-        courtDTO.setDescription(court.getCourtDescription());
-        courtDTO.setStatus(court.getStatus().getStatus());
-        courtDTO.setCapacity(court.getCapacity());
-        courtDTO.setPricePerHour(court.getPricePerHour());
-        courtDTO.setSport(court.getSport().getSportName());
-        courtDTO.setCity(court.getCity().getCityName());
-        courtDTO.setAddress(court.getAddress());
-        courtDTO.setNeighborhood(court.getNeighborhood());
-        courtDTO.setImageUrl(court.getImageUrl());
         return courtDTO;
     }
 

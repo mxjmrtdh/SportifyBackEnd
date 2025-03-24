@@ -16,7 +16,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.Map;
 
 @RestController
@@ -91,7 +90,7 @@ public class AuthController {
     }
 
     @GetMapping("/verifyEmail")
-    public void verifyEmail(@RequestParam("token") String token, HttpServletResponse response) throws IOException {
+    public void verifyEmail(@RequestParam("token") String token, HttpServletResponse response){
         // Imprime el token recibido en la consola para verificación
         System.out.println("Recibida solicitud de verificación para token: " + token);
 
@@ -128,8 +127,6 @@ public class AuthController {
             }
         } catch (Exception e) {
             log.error("Error durante la verificación: {}", e.getMessage(), e);
-
-            response.sendRedirect("http://localhost:3000/verification?status=error");
         }
     }
 

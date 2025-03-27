@@ -39,14 +39,13 @@ public class SecurityFilterChainConfig {
         // 3. Configura las reglas de autorización para las solicitudes HTTP.
         httpSecurity.authorizeHttpRequests(
                         requestMatcher -> requestMatcher
-                                .requestMatchers("/api/auth/**").permitAll() // Permite el acceso público a las rutas de login.
-                                .requestMatchers("/api/public/**").permitAll() // Permite el acceso público.
+                                .requestMatchers("/api/auth/**", "/api/public/**", "/api/bookings/search", "/api/bookings/*/availability").permitAll() // Permite el acceso público a las rutas de login.
                                 .requestMatchers("/api/public/courts/search?page=1&size=10/**").permitAll() // Permite el acceso público a las rutas de courts.
+                                //.requestMatchers("/api/auth/verifyEmail/**").permitAll()
                                 .requestMatchers("/admin/**").hasAnyRole("ADMIN")// Permite el acceso público a las rutas de registro.
-                                .requestMatchers("/api/auth/verifyEmail/**").permitAll()
-                                .requestMatchers("/api/user/**").hasAnyRole("SUPER_ADMIN", "ADMIN")
-                                .requestMatchers("/api/public/users/all/**").hasAnyRole("SUPER_ADMIN", "ADMIN")
+                                .requestMatchers("/api/users/all").hasAnyRole("SUPER_ADMIN", "ADMIN")
                                 .requestMatchers("/api/roles/**").hasAnyRole("SUPER_ADMIN", "ADMIN")
+                                .requestMatchers("/api/bookings/create").hasAnyRole("SUPER_ADMIN", "ADMIN", "USER")
                                 .requestMatchers("/api/favorites/**").hasAnyRole("SUPER_ADMIN", "ADMIN", "USER")
                                 .anyRequest().authenticated() // Requiere autenticación para cualquier otra solicitud.
                 )

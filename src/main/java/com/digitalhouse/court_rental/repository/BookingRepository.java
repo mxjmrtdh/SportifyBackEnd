@@ -16,9 +16,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long>{
         WHERE b.court.id = :courtId 
         AND b.bookingDate = :bookingDate
         AND (
-            (:startTime BETWEEN b.startTime AND b.endTime) 
-            OR (:endTime BETWEEN b.startTime AND b.endTime)
-            OR (b.startTime BETWEEN :startTime AND :endTime)
+            (:startTime < b.endTime AND :endTime > b.startTime)
         )
     """)
     boolean existsOverlappingBooking(

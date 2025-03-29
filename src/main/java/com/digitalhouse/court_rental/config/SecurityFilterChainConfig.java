@@ -46,7 +46,7 @@ public class SecurityFilterChainConfig {
                                 .requestMatchers("/api/users/all").hasAnyRole("SUPER_ADMIN", "ADMIN")
                                 .requestMatchers("/api/roles/**").hasAnyRole("SUPER_ADMIN", "ADMIN")
                                 .requestMatchers("/api/bookings/create").hasAnyRole("SUPER_ADMIN", "ADMIN", "USER")
-                                .requestMatchers("/api/favorites/**").hasAnyRole("SUPER_ADMIN", "ADMIN", "USER")
+                                .requestMatchers("/api/favorites/**", "/api/users/currentUser").hasAnyRole("SUPER_ADMIN", "ADMIN", "USER")
                                 .anyRequest().authenticated() // Requiere autenticación para cualquier otra solicitud.
                 )
 

@@ -4,6 +4,7 @@ import com.digitalhouse.court_rental.dto.UserDTO;
 import com.digitalhouse.court_rental.entity.User;
 import com.digitalhouse.court_rental.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,5 +18,12 @@ public class UserService {
     public List<UserDTO> getAllUsers() {
         List<User> users = userRepository.findAll();
         return users.stream().map(UserDTO::new).collect(Collectors.toList());
+    }
+
+    public UserDTO getCurrentUser(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
+
+        return new UserDTO(user);
     }
 }

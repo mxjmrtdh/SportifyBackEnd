@@ -1,6 +1,7 @@
 package com.digitalhouse.court_rental.dto;
 
 import com.digitalhouse.court_rental.entity.User;
+import com.digitalhouse.court_rental.entity.court.Country;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
@@ -33,6 +34,8 @@ public class UserDTO {
 
     private Integer statusId;
 
+    private Integer country;
+
     private Set<String> roles;
 
     public UserDTO(User user) {
@@ -43,6 +46,8 @@ public class UserDTO {
         this.phoneNumber = user.getPhoneNumber();
         this.birthdate = user.getBirthdate();
         this.statusId = user.getStatusId();
+        this.country = user.getCountry() != null ? user.getCountry().getIdCountry() : null;
+        //this.country = user.getCountry() != null ? user.getCountry().getCountryName() : null;
         this.roles = user.getRoles().stream().map(rol -> rol.getName().name()).collect(Collectors.toSet());
     }
 }

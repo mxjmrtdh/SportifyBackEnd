@@ -38,6 +38,8 @@ public class UserDTO {
 
     private Set<String> roles;
 
+    public UserDTO() {
+    }
     public UserDTO(User user) {
         this.id = user.getId_user();
         this.name = user.getName();

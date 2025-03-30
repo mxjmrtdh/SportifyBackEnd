@@ -2,7 +2,6 @@ package com.digitalhouse.court_rental.controller;
 
 import com.digitalhouse.court_rental.dto.PasswordUpdateDTO;
 import com.digitalhouse.court_rental.dto.UserDTO;
-//import com.digitalhouse.court_rental.service.UserService;
 import com.digitalhouse.court_rental.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +31,16 @@ public class UserController {
     public ResponseEntity<UserDTO> getCurrentUser(@AuthenticationPrincipal UserDetails userDetails) {
         UserDTO userDTO = userService.getCurrentUser(userDetails.getUsername());
         return ResponseEntity.ok(userDTO);
+    }
+
+    @PutMapping("/update-user-data")
+    public ResponseEntity<UserDTO> updateUserData(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestBody(required = false) UserDTO userDTO,
+            @RequestBody(required = false) PasswordUpdateDTO passwordUpdateDTO) {
+
+            UserDTO updatedUser = userService.updateUserData(userDetails.getUsername(), userDTO, passwordUpdateDTO);
+            return ResponseEntity.ok(updatedUser);
     }
 
     @PutMapping("/update-password")

@@ -110,6 +110,30 @@ public class BookingService {
         return bookingRepository.save(booking);
     }
 
+    public List<Map<String, Object>> getUserBookingHistory(Authentication authentication) {
+        User authenticatedUser = getAuthenticatedUser(authentication);
+
+        List<Object[]> results = bookingRepository.getUserBookingHistory(authenticatedUser.getId_user().intValue());
+        List<Map<String, Object>> bookingHistory = new ArrayList<>();
+
+        for (Object[] row : results) {
+            Map<String, Object> booking = new HashMap<>();
+            booking.put("idBooking", row[0]);
+            booking.put("registrationDate", row[1]);
+            booking.put("bookingDate", row[2]);
+            booking.put("bookingTimeRange", row[3]);
+            booking.put("courtId", row[4]);
+            booking.put("courtName", row[5]);
+            booking.put("statusId", row[6]);
+            booking.put("status", row[7]);
+            booking.put("sportId", row[8]);
+            booking.put("sportName", row[9]);
+            bookingHistory.add(booking);
+        }
+
+        return bookingHistory;
+    }
+
     private boolean isCourtAvailable(int courtId, LocalDate bookingDate, LocalTime startTime, LocalTime endTime) {
         return !bookingRepository.existsOverlappingBooking(courtId, bookingDate, startTime, endTime);
     }
@@ -156,6 +180,5 @@ public class BookingService {
 
         return response;
     }
-
 
 }

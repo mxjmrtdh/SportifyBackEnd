@@ -132,8 +132,18 @@ public class BookingService {
         LocalDate endDate = today.plusMonths(1);
 
         for (LocalDate date = today; date.isBefore(endDate); date = date.plusDays(1)) {
-            List<LocalTime> reservedTimes = bookingRepository.findReservedTimesByCourtAndDate(courtId, date);
+            List<Object[]> reservedTimeRanges = bookingRepository.findReservedTimesByCourtAndDate (courtId, date);
+            List<LocalTime> reservedTimes = new ArrayList<>();
             List<LocalTime> availableTimes = new ArrayList<>();
+
+            for (Object[] timeRange : reservedTimeRanges) {
+                LocalTime startTime = (LocalTime) timeRange[0];
+                LocalTime endTime = (LocalTime) timeRange[1];
+
+                for (LocalTime t = startTime; t.isBefore(endTime); t = t.plusHours(1)) {
+                    reservedTimes.add(t);
+                }
+            }
 
             for (int hour = 7; hour < 22; hour++) {
                 LocalTime timeSlot = LocalTime.of(hour, 0);
@@ -156,6 +166,4 @@ public class BookingService {
 
         return response;
     }
-
-
 }

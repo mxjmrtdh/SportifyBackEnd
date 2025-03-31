@@ -1,7 +1,6 @@
 package com.digitalhouse.court_rental.dto;
 
 import com.digitalhouse.court_rental.entity.User;
-import com.digitalhouse.court_rental.entity.court.Country;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;

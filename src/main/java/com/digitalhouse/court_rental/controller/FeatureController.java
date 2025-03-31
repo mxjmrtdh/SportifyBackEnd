@@ -1,10 +1,7 @@
 package com.digitalhouse.court_rental.controller;
 
-import com.digitalhouse.court_rental.dto.CourtDTO;
-import com.digitalhouse.court_rental.dto.CourtRequestDTO;
 import com.digitalhouse.court_rental.dto.FeatureDTO;
 import com.digitalhouse.court_rental.dto.FeatureRequestDTO;
-import com.digitalhouse.court_rental.entity.Court;
 import com.digitalhouse.court_rental.entity.Feature;
 import com.digitalhouse.court_rental.service.FeatureService;
 import com.fasterxml.jackson.databind.ObjectMapper;

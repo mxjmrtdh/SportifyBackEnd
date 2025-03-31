@@ -1,8 +1,12 @@
 package com.digitalhouse.court_rental.util;
 
 import io.github.cdimascio.dotenv.Dotenv;
+import io.jsonwebtoken.Jwts;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.Date;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -13,45 +17,38 @@ class JwtUtilTest {
 
     @BeforeEach
     void setUp() {
-//        Dotenv dotenv = Dotenv.load();
-//        jwtUtil = new JwtUtil(dotenv.get("JWT_SECRET"));
-//        jwtUtil = new JwtUtil();
         testToken = jwtUtils.generateToken("test@example.com");
     }
 
     @Test
     void testGenerateToken() {
         assertNotNull(testToken);
+        assertTrue(testToken.startsWith("eyJ"));
     }
 
-//    @Test
-//    void testExtractEmail() {
-//        assertEquals("test@example.com", jwtUtil.extractEmail(testToken));
-//    }
-//
-//    @Test
-//    void testExtractRole() {
-//        assertEquals("ROLE_USER", jwtUtil.extractRole(testToken));
-//    }
-//
-//    @Test
-//    void testIsTokenValid() {
-//        assertTrue(jwtUtil.isTokenValid(testToken, "test@example.com"));
-//    }
-
-    /*
     @Test
-    void testIsTokenExpired() {
-        String expiredToken = Jwts.builder()
-                .setSubject("test@example.com")
-                .setIssuedAt(new Date(System.currentTimeMillis() - 10000))
-                .setExpiration(new Date(System.currentTimeMillis() - 5000))
-                .signWith(secretKey, SignatureAlgorithm.HS256)
-                .compact();
-
-        assertFalse(jwtUtil.isTokenValid(expiredToken, "test@example.com"));
+    void testValidateToken_ValidToken() {
+        assertTrue(JwtUtils.validateToken(testToken));
     }
-     */
 
+    @Test
+    void testValidateToken_InvalidToken() {
+        String invalidToken = "invalid.token.value";
+        assertFalse(JwtUtils.validateToken(invalidToken));
+    }
+
+    @Test
+    void testGetUsernameFromToken_ValidToken() {
+        Optional<String> username = JwtUtils.getUsernameFromToken(testToken);
+        assertTrue(username.isPresent());
+        assertEquals("test@example.com", username.get());
+    }
+
+    @Test
+    void testGetUsernameFromToken_InvalidToken() {
+        String invalidToken = "invalid.token.value";
+        Optional<String> username = JwtUtils.getUsernameFromToken(invalidToken);
+        assertFalse(username.isPresent());
+    }
 
 }

@@ -13,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -40,16 +41,18 @@ public class BookingController {
     }
 
     @PostMapping(value = "/create", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> createBooking(@RequestBody BookingDTO bookingDTO,
-                                           Authentication authentication
-                                           ) {
+    public ResponseEntity<?> createBooking(@RequestBody BookingDTO bookingDTO, Authentication authentication) {
         try {
             Booking newBooking = bookingService.createBooking(bookingDTO, authentication);
             return ResponseEntity.ok(newBooking);
+        } catch (ResponseStatusException e) {
+            // Captura explícita de la excepción 409
+            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
 
     @GetMapping("/{courtId}/availability")
     public ResponseEntity<?> getAvailability(@PathVariable Long courtId) {

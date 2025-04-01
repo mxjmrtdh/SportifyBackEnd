@@ -4,7 +4,6 @@ import com.digitalhouse.court_rental.dto.BookingDTO;
 import com.digitalhouse.court_rental.dto.CourtDTO;
 import com.digitalhouse.court_rental.dto.PagedResponse;
 import com.digitalhouse.court_rental.entity.Booking;
-import com.digitalhouse.court_rental.entity.Court;
 import com.digitalhouse.court_rental.service.BookingService;
 import lombok.AllArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -63,6 +62,11 @@ public class BookingController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error al obtener disponibilidad. Intente más tarde.");
         }
+    }
+
+    @GetMapping("/history")
+    public List<Map<String, Object>> getBookingHistory(Authentication authentication) {
+        return bookingService.getUserBookingHistory(authentication);
     }
 
 }

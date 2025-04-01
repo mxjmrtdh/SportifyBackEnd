@@ -37,5 +37,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long>{
             @Param("courtId") Long courtId,
             @Param("bookingDate") LocalDate bookingDate
     );
+
+    @Query(value = "CALL GetBookings(:id_user)", nativeQuery = true)
+    List<Object[]> getUserBookingHistory(@Param("id_user") int id_user);
 }
 

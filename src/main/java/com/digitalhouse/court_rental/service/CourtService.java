@@ -148,8 +148,8 @@ public class CourtService {
 
         CourtDTO courtDTO = null;
         Set<String> images = new HashSet<>();
-        Map<String, String> features = new HashMap<>();
-        Map<String, String> featuresImageUrl = new HashMap<>();
+        Map<String, String> features = new LinkedHashMap<>();
+        Map<String, String> featuresImageUrl = new LinkedHashMap<>();
 
         for (Object[] obj : results) {
             if (courtDTO == null) { // Asignar la instancia en la primera iteración

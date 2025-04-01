@@ -9,10 +9,14 @@ import com.digitalhouse.court_rental.entity.User;
 import com.digitalhouse.court_rental.repository.BookingRepository;
 import com.digitalhouse.court_rental.repository.CourtRepository;
 import com.digitalhouse.court_rental.repository.UserRepository;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -87,7 +91,7 @@ public class BookingService {
         );
     }
 
-    public Booking createBooking(BookingDTO bookingDTO, Authentication authentication) {
+    public Booking createBooking(@Valid @RequestBody BookingDTO bookingDTO, Authentication authentication) {
         User authenticatedUser = getAuthenticatedUser(authentication);
 
         Court court = courtRepository.findById((long) bookingDTO.getCourtId())
@@ -95,7 +99,7 @@ public class BookingService {
 
         boolean available = isCourtAvailable(court.getIdCourt(), bookingDTO.getBookingDate(), bookingDTO.getStartTime(), bookingDTO.getEndTime());
         if (!available) {
-            throw new RuntimeException("La cancha ya está reservada en ese horario.");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "La cancha ya está reservada en este horario. Por favor, elige otro disponible.");
         }
 
         Booking booking = new Booking();
@@ -156,8 +160,18 @@ public class BookingService {
         LocalDate endDate = today.plusMonths(1);
 
         for (LocalDate date = today; date.isBefore(endDate); date = date.plusDays(1)) {
-            List<LocalTime> reservedTimes = bookingRepository.findReservedTimesByCourtAndDate(courtId, date);
+            List<Object[]> reservedTimeRanges = bookingRepository.findReservedTimesByCourtAndDate (courtId, date);
+            List<LocalTime> reservedTimes = new ArrayList<>();
             List<LocalTime> availableTimes = new ArrayList<>();
+
+            for (Object[] timeRange : reservedTimeRanges) {
+                LocalTime startTime = (LocalTime) timeRange[0];
+                LocalTime endTime = (LocalTime) timeRange[1];
+
+                for (LocalTime t = startTime; t.isBefore(endTime); t = t.plusHours(1)) {
+                    reservedTimes.add(t);
+                }
+            }
 
             for (int hour = 7; hour < 22; hour++) {
                 LocalTime timeSlot = LocalTime.of(hour, 0);

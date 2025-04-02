@@ -81,6 +81,7 @@ public class AuthServiceImpl implements AuthService {
                 .token(jwt)
                 .fullName(user.getName() + " " + user.getLastName())
                 .role(role)
+                .email(email)
                 .build();
     }
 

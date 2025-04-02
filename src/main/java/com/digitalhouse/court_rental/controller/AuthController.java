@@ -40,17 +40,10 @@ public class AuthController {
             // Llama al servicio para autenticar al usuario y generar un token JWT
             var jwtToken = authService.login(authRequestDto.getEmail(), authRequestDto.getPassword());
             // Crea un objeto de respuesta con el token y el estado de éxito
-            var authResponseDto = new AuthResponseDTO(
-                    jwtToken.getToken(),
-                    jwtToken.getFullName(),
-                    jwtToken.getRole(),
-                    "Inicio de sesion exitoso",
-                    AuthStatus.LOGIN_SUCCESS
-            );
 
             return ResponseEntity
                     .status(HttpStatus.OK)
-                    .body(authResponseDto);
+                    .body(jwtToken);
 
         } catch (Exception e) {
             return buildErrorResponse(e);
@@ -150,7 +143,7 @@ public class AuthController {
                 .findFirst()
                 .orElse(e.getMessage());
 
-        var authResponseDto = new AuthResponseDTO(null, null, null, errorMessage, AuthStatus.LOGIN_FAILED);
+        var authResponseDto = new AuthResponseDTO(null, null, null,null, errorMessage, AuthStatus.LOGIN_FAILED);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(authResponseDto);
     }
 

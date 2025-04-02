@@ -16,6 +16,7 @@ public class AuthResponseDTO {
     private String token;
     private String fullName;
     private String role;
+    private String email;
 
     private String message;
     AuthStatus authStatus;// Representa el estado de la operación de autenticación o registro.

@@ -11,6 +11,7 @@ import com.digitalhouse.court_rental.entity.court.City;
 import com.digitalhouse.court_rental.entity.court.Sport;
 import com.digitalhouse.court_rental.repository.*;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -238,5 +239,63 @@ public class CourtService {
             courts.add(courtDTO);
         }
         return courts;
+    }
+
+    @Transactional
+    public Court updateCourt(Long courtId, CourtRequestDTO courtRequest, List<MultipartFile> images) {
+        Court court = courtRepository.findById(courtId)
+                .orElseThrow(() -> new RuntimeException("Court not found"));
+
+        court.setCourtName(courtRequest.getName());
+        court.setCourtDescription(courtRequest.getDescription());
+        court.setCapacity(courtRequest.getCapacity());
+        court.setPricePerHour(courtRequest.getPricePerHour());
+        court.setAddress(courtRequest.getAddress());
+        court.setNeighborhood(courtRequest.getNeighborhood());
+
+        Sport sport = sportRepository.findById((long) courtRequest.getSportId())
+                .orElseThrow(() -> new RuntimeException("Sport not found"));
+        City city = cityRepository.findById(courtRequest.getCityId())
+                .orElseThrow(() -> new RuntimeException("City not found"));
+        Status status = statusRepository.findById(courtRequest.getStatusId())
+                .orElseThrow(() -> new RuntimeException("Status not found"));
+
+        court.setSport(sport);
+        court.setCity(city);
+        court.setStatus(status);
+
+        // Eliminar todas las features asociadas
+        productFeatureRepository.deleteByCourtId(courtId);
+
+        // Agregar nuevas features
+        if (courtRequest.getFeatureIds() != null) {
+            for (Integer featureId : courtRequest.getFeatureIds()) {
+                Feature feature = featureRepository.findById(Long.valueOf(featureId))
+                        .orElseThrow(() -> new RuntimeException("Feature not found"));
+
+                ProductFeature productFeature = new ProductFeature();
+                productFeature.setCourt(court);
+                productFeature.setFeature(feature);
+
+                productFeatureRepository.save(productFeature);
+            }
+        }
+
+        // Eliminar imágenes anteriores y subir nuevas imágenes
+        court.setImageUrl(new ArrayList<>());
+        if (images != null && !images.isEmpty()) {
+            List<String> imageLinks = new ArrayList<>();
+            for (MultipartFile image : images) {
+                try {
+                    String link = imgurService.uploadFile(image);
+                    imageLinks.add(link);
+                } catch (Exception e) {
+                    log.error("Error al subir imagen a Imgur", e);
+                }
+            }
+            court.setImageUrl(imageLinks);
+        }
+
+        return courtRepository.save(court);
     }
 }

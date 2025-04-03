@@ -46,24 +46,21 @@ public class FeatureService {
         return convertToDTO(feature);
     }
 
-    public Feature addFeature(FeatureRequestDTO featureRequest, List<MultipartFile> images) throws IOException {
+    public Feature addFeature(FeatureRequestDTO featureRequest, MultipartFile  image) throws IOException {
         Feature feature = new Feature();
         feature.setFeature(featureRequest.getFeature());
 
-        Status status = statusRepository.findById(featureRequest.getStatusId())
-                .orElseThrow(() -> new RuntimeException("Status not found"));
+        Status status = statusRepository.findById(24)
+                .orElseThrow(() -> new RuntimeException("Status 24 not found"));
         feature.setStatus(status);
 
-        // Subir imagen a Imgur y guardar URL
-        if (images != null) {
-            for (MultipartFile image : images) {
-                try {
-                    String imageLink = imgurService.uploadFile(image);
-                    feature.setImage_url(imageLink);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    throw new RuntimeException("Error uploading image: " + e.getMessage());
-                }
+        if (image != null) {
+            try {
+                String imageLink = imgurService.uploadFile(image);
+                feature.setImage_url(imageLink);
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new RuntimeException("Error uploading image: " + e.getMessage());
             }
         }
 
@@ -73,5 +70,29 @@ public class FeatureService {
     @Transactional
     public void updateStatus(Long id) {
         featureRepository.updateFeatureStatus(id, 25);
+    }
+
+    @Transactional
+    public void updateFeature(Long id, String featureName, MultipartFile image) throws IOException {
+        Feature feature = featureRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Feature not found"));
+
+        feature.setFeature(featureName);
+
+        Status status = statusRepository.findById(24)
+                .orElseThrow(() -> new RuntimeException("Status 24 not found"));
+        feature.setStatus(status);
+
+        if (image != null) {
+            try {
+                String imageLink = imgurService.uploadFile(image);
+                feature.setImage_url(imageLink);
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new RuntimeException("Error uploading image: " + e.getMessage());
+            }
+        }
+
+        featureRepository.save(feature);
     }
 }

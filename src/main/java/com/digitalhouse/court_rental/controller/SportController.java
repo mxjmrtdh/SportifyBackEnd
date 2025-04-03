@@ -43,4 +43,21 @@ public class SportController {
         }
     }
 
+    @GetMapping("/{sportId}")
+    public ResponseEntity<SportDTO> getSportById(@PathVariable int sportId) {
+        SportDTO sportDTO = sportService.getSportById(sportId);
+        return sportDTO != null ? ResponseEntity.ok(sportDTO) : ResponseEntity.notFound().build();
+    }
+
+    @PutMapping("/update/{sportId}")
+    public ResponseEntity<String> updateSport(@PathVariable int sportId, @RequestBody SportRequestDTO sportRequestDTO) {
+        try {
+            sportService.updateSport(sportId, sportRequestDTO);
+            return ResponseEntity.ok("Deporte actualizado exitosamente");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al actualizar el deporte: " + e.getMessage());
+        }
+    }
+
 }

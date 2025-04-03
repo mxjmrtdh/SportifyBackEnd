@@ -61,4 +61,18 @@ public class CourtController {
     public ResponseEntity<List<CourtDTO>> getCourtsBySport(@PathVariable int sportId) {
         return ResponseEntity.ok(courtService.getCourtsBySport(sportId));
     }
+
+    @PutMapping(value = "/update/{id}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<Court> updateCourt(
+            @PathVariable Long id,
+            @RequestPart("court") String courtJson,
+            @RequestPart(value = "images", required = false) List<MultipartFile> images) throws IOException {
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        CourtRequestDTO courtRequest = objectMapper.readValue(courtJson, CourtRequestDTO.class);
+
+        Court updatedCourt = courtService.updateCourt(id, courtRequest, images);
+        return ResponseEntity.ok(updatedCourt);
+    }
+
 }

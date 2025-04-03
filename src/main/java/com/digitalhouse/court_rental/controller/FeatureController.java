@@ -38,12 +38,13 @@ public class FeatureController {
     @PostMapping(value = "/features/add", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<Feature> createFeature(
             @RequestPart("feature") String featureJson,
-            @RequestPart(value = "images", required = false) List<MultipartFile> images) throws IOException {
+            @RequestPart(value = "image", required = false) MultipartFile image) throws IOException {
 
         ObjectMapper objectMapper = new ObjectMapper();
         FeatureRequestDTO featureRequest = objectMapper.readValue(featureJson, FeatureRequestDTO.class);
 
-        Feature newFeature = featureService.addFeature(featureRequest, images);
+        Feature newFeature = featureService.addFeature(featureRequest, image);
+
         return ResponseEntity.status(HttpStatus.CREATED).body(newFeature);
     }
 
@@ -51,5 +52,18 @@ public class FeatureController {
     public ResponseEntity<String> deactivate(@PathVariable int id) {
         featureService.updateStatus((long) id);
         return ResponseEntity.ok("Court deleted successfully");
+    }
+
+    @PutMapping(value = "/features/{id}/update", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<String> updateFeature(
+            @PathVariable Long id,
+            @RequestPart("feature") String featureJson,
+            @RequestPart(value = "image", required = false) MultipartFile image) throws IOException {
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        FeatureRequestDTO featureRequest = objectMapper.readValue(featureJson, FeatureRequestDTO.class);
+
+        featureService.updateFeature(id, featureRequest.getFeature(), image);
+        return ResponseEntity.ok("Feature updated successfully");
     }
 }

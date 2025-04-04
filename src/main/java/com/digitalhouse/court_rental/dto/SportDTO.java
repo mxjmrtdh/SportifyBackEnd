@@ -14,4 +14,9 @@ public class SportDTO {
     private String name;
     private String icon;
     private String description;
+
+    public SportDTO(int i, String soccer) {
+        this.id = id;
+        this.name = name;
+    }
 }

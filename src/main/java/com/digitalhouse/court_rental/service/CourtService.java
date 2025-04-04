@@ -135,7 +135,6 @@ public class CourtService {
         return new PagedResponse<>(courts, page, size, totalElements);
     }
 
-
     public CourtDTO getCourtById(Integer id) {
         if (id == null) {
             throw new IllegalArgumentException("ID cannot be null");
@@ -153,30 +152,32 @@ public class CourtService {
         Map<String, String> featuresImageUrl = new LinkedHashMap<>();
 
         for (Object[] obj : results) {
-            if (courtDTO == null) { // Asignar la instancia en la primera iteración
+            if (courtDTO == null) {
                 courtDTO = new CourtDTO();
                 courtDTO.setId((Integer) obj[0]);
                 courtDTO.setName((String) obj[1]);
                 courtDTO.setSport((String) obj[2]);
-                courtDTO.setCity((String) obj[3]);
-                courtDTO.setStatus((String) obj[4]);
-                courtDTO.setDescription((String) obj[5]);
-                courtDTO.setCapacity((Integer) obj[6]);
-                courtDTO.setPricePerHour((BigDecimal) obj[7]);
-                courtDTO.setAddress((String) obj[8]);
-                courtDTO.setNeighborhood((String) obj[9]);
+                courtDTO.setCity((String) obj[4]);
+                courtDTO.setRegion((String) obj[6]);
+                courtDTO.setCountry((String) obj[8]);
+                courtDTO.setStatus((String) obj[9]);
+                courtDTO.setDescription((String) obj[10]);
+                courtDTO.setCapacity((Integer) obj[11]);
+                courtDTO.setPricePerHour((BigDecimal) obj[12]);
+                courtDTO.setAddress((String) obj[13]);
+                courtDTO.setNeighborhood((String) obj[14]);
             }
 
-            if (obj[10] != null) {
-                images.add(obj[10].toString());
+            if (obj[15] != null) {
+                images.add(obj[15].toString());
             }
 
-            if (obj[11] != null) {
-                features.put(obj[11].toString(), obj[11].toString());
+            if (obj[16] != null) {
+                features.put(obj[16].toString(), obj[16].toString());
             }
 
-            if (obj[12] != null) {
-                featuresImageUrl.put(obj[12].toString(), obj[12].toString());
+            if (obj[17] != null) {
+                featuresImageUrl.put(obj[17].toString(), obj[17].toString());
             }
         }
 
@@ -186,6 +187,7 @@ public class CourtService {
 
         return courtDTO;
     }
+
 
     public List<CourtDTO> getRandomCourts() {
         List<Object[]> results = courtRepository.getRandomCourts();

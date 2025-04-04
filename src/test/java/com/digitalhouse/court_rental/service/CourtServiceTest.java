@@ -110,14 +110,36 @@ class CourtServiceTest {
     @Test
     void testGetCourtById_Success() {
         when(courtRepository.getCourtById(1L)).thenReturn(Collections.singletonList(
-                new Object[]{1, "Court 1", "Tennis", "Cusco", "Active", "Description", 10, BigDecimal.valueOf(50), "Address", "Neighborhood", "image_url", "feature", "feature_image"}
+                new Object[]{
+                        1,
+                        "Court 1",
+                        "Tennis",
+                        null,
+                        "Bogotá",
+                        null,
+                        "Bogotá D.C.",
+                        null,
+                        "Colombia",
+                        "Active",
+                        "Nice place",
+                        10,
+                        BigDecimal.valueOf(50),
+                        "123 Main St",
+                        "Downtown",
+                        "image_url",
+                        "WiFi",
+                        "wifi_image_url"
+                }
         ));
 
         CourtDTO result = courtService.getCourtById(1);
         assertNotNull(result);
         assertEquals("Court 1", result.getName());
         assertEquals("Tennis", result.getSport());
+        assertEquals("Bogotá D.C.", result.getRegion());
+        assertEquals("Colombia", result.getCountry());
     }
+
 
     @Test
     void testGetCourtById_NotFound() {

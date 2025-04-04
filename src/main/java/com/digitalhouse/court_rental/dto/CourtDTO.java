@@ -22,4 +22,6 @@ public class CourtDTO {
     private List<String> imageUrl;
     private List<String> features;
     private List<String> featuresImageUrl;
+    private String region;
+    private String country;
 }

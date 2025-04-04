@@ -6,10 +6,7 @@ import com.digitalhouse.court_rental.entity.Court;
 import com.digitalhouse.court_rental.entity.Status;
 import com.digitalhouse.court_rental.entity.court.City;
 import com.digitalhouse.court_rental.entity.court.Sport;
-import com.digitalhouse.court_rental.repository.CityRepository;
-import com.digitalhouse.court_rental.repository.CourtRepository;
-import com.digitalhouse.court_rental.repository.SportRepository;
-import com.digitalhouse.court_rental.repository.StatusRepository;
+import com.digitalhouse.court_rental.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,6 +36,12 @@ class CourtServiceTest {
     private StatusRepository statusRepository;
     @Mock
     private ImgurService imgurService;
+    @Mock
+    private FeatureRepository featureRepository;
+
+    @Mock
+    private ProductFeatureRepository productFeatureRepository;
+
 
     @InjectMocks
     private CourtService courtService;
@@ -135,6 +138,52 @@ class CourtServiceTest {
 
         courtService.deleteCourt(1L);
         assertEquals(2, sampleCourt.getStatus().getIdStatus());
+        verify(courtRepository, times(1)).save(sampleCourt);
+    }
+
+    @Test
+    void testDeleteCourt_NotFound() {
+        when(courtRepository.findById(99L)).thenReturn(Optional.empty());
+
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> courtService.deleteCourt(99L));
+        assertEquals("Court not found", exception.getMessage());
+    }
+
+    @Test
+    void testCreateCourt_AlreadyExists() {
+        CourtRequestDTO requestDTO = new CourtRequestDTO();
+        requestDTO.setName("Court 1");
+
+        when(courtRepository.findByCourtName(requestDTO.getName())).thenReturn(Optional.of(sampleCourt));
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            courtService.createCourt(requestDTO, null);
+        });
+
+        assertEquals("La cancha ya está registrada", exception.getMessage());
+    }
+    @Test
+    void testUpdateCourt_Success() throws IOException {
+        CourtRequestDTO requestDTO = new CourtRequestDTO();
+        requestDTO.setName("Updated Court");
+        requestDTO.setDescription("Updated Description");
+        requestDTO.setCapacity(15);
+        requestDTO.setPricePerHour(BigDecimal.valueOf(60.00));
+        requestDTO.setAddress("Updated Address");
+        requestDTO.setNeighborhood("Updated Neighborhood");
+        requestDTO.setSportId(1);
+        requestDTO.setCityId(1);
+        requestDTO.setStatusId(1);
+
+        when(courtRepository.findById(1L)).thenReturn(Optional.of(sampleCourt));
+        when(sportRepository.findById(1L)).thenReturn(Optional.of(sampleSport));
+        when(cityRepository.findById(1)).thenReturn(Optional.of(sampleCity));
+        when(statusRepository.findById(1)).thenReturn(Optional.of(sampleStatus));
+        when(courtRepository.save(any(Court.class))).thenReturn(sampleCourt);
+
+        Court result = courtService.updateCourt(1L, requestDTO, null);
+        assertNotNull(result);
+        assertEquals("Updated Court", result.getCourtName());
         verify(courtRepository, times(1)).save(sampleCourt);
     }
 }

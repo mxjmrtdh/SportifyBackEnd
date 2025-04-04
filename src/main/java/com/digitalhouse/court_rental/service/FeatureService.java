@@ -8,15 +8,16 @@ import com.digitalhouse.court_rental.repository.FeatureRepository;
 import com.digitalhouse.court_rental.repository.StatusRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class FeatureService {
     private final FeatureRepository featureRepository;
     private final StatusRepository statusRepository;
@@ -46,7 +47,7 @@ public class FeatureService {
         return convertToDTO(feature);
     }
 
-    public Feature addFeature(FeatureRequestDTO featureRequest, MultipartFile  image) throws IOException {
+    public Feature addFeature(FeatureRequestDTO featureRequest, MultipartFile  image) {
         Feature feature = new Feature();
         feature.setFeature(featureRequest.getFeature());
 
@@ -59,7 +60,7 @@ public class FeatureService {
                 String imageLink = imgurService.uploadFile(image);
                 feature.setImage_url(imageLink);
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error("Error uploading image: {}", e.getMessage(), e);
                 throw new RuntimeException("Error uploading image: " + e.getMessage());
             }
         }
@@ -73,7 +74,7 @@ public class FeatureService {
     }
 
     @Transactional
-    public void updateFeature(Long id, String featureName, MultipartFile image) throws IOException {
+    public void updateFeature(Long id, String featureName, MultipartFile image) {
         Feature feature = featureRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Feature not found"));
 
@@ -88,7 +89,7 @@ public class FeatureService {
                 String imageLink = imgurService.uploadFile(image);
                 feature.setImage_url(imageLink);
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error("Error uploading image: {}", e.getMessage(), e);
                 throw new RuntimeException("Error uploading image: " + e.getMessage());
             }
         }

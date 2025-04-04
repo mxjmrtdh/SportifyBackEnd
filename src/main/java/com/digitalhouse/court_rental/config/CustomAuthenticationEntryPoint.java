@@ -1,6 +1,5 @@
 package com.digitalhouse.court_rental.config;
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
@@ -20,11 +19,10 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
      * @param response La respuesta HTTP que se enviará al cliente.
      * @param authException La excepción que se generó debido a la falta de autenticación.
      * @throws IOException Si ocurre un error al escribir en la respuesta.
-     * @throws ServletException Si ocurre un error relacionado con el servlet.
      */
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)
-            throws IOException, ServletException {
+            throws IOException {
 
         // Envía un error HTTP 401 (Unauthorized) como respuesta al cliente,
         // indicando que no tiene permiso para acceder al recurso solicitado.
